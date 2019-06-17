@@ -12,7 +12,7 @@ Every function returns an autoTensor that has a backpropagation channel to compu
 
 #### Example
 
-![github-small](autofiff.jpeg)
+![Example](https://github.com/jay1999ke/autodiff/raw/master/autodiff.jpeg)
 
 Consider a function F3,
 
