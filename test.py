@@ -41,7 +41,7 @@ print(t1.grad)
 print(t2.grad)
 """ 
 t1 = autoTensor(torch.Tensor([[1, 2, 3], [4, 5, 6]]), requires_grad = True)    # (2, 3)
-t2 = autoTensor(torch.Tensor([7, 8, 9]), requires_grad = False)               # (1, 3)
+t2 = autoTensor(torch.Tensor([7, 8, 9]), requires_grad = True)               # (1, 3)
 
 t3 = Multiply(t1,t2)
 

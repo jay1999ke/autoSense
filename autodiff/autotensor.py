@@ -4,7 +4,6 @@ import numpy as np
 
 def make_autoTensor(tensor):
     t_type = type(tensor)
-    print(t_type)
     if t_type == int or t_type == float or t_type == bool:
         return autoTensor(value=torch.Tensor([tensor]))
     elif isinstance(tensor,autoTensor):
@@ -33,7 +32,7 @@ class autoTensor:
         return f"autoTensor({self.value.size()})"
 
     def __repr__(self):
-        return f"autoTensor({self.value})"
+        return f"autoTensor(\n{self.value})\n"
 
     def backprop(self, gradient):
         assert self.requires_grad, "called backward on non-requires-grad tensor"
@@ -92,10 +91,21 @@ class autoTensor:
     def Mul(self,other):
         return Multiply(self,make_autoTensor(other))
 
+    def __imul__(self, other):
+        self.value = self.value * make_autoTensor(other).value
+        return self
 
+    def __mul__(self, other):
+        return Multiply(self,make_autoTensor(other))
 
-class Node:    
+    def __rmul__(self, other):
+        return Multiply(self,make_autoTensor(other))
+
+class Node:   
+    """Node for a reverse computation graph"""
+
     def __init__(self, autoVariable, compute_gradient):
+        """A node holds a dependent variable and a vjp"""
         assert type(compute_gradient) == type(self.__init__), "None-Callable generated"
 
         self.autoVariable = autoVariable
@@ -103,6 +113,7 @@ class Node:
 
     @staticmethod
     def dfs(dependencies,gradient):
+        """This is where the magic happens"""
         for dependency in dependencies:
             if dependency.autoVariable.requires_grad:
                 back_gradient = dependency.compute_gradient(gradient)
@@ -110,4 +121,4 @@ class Node:
 
 
 # Dealing with circular imports
-from autodiff.functional import MatMul, Add, Multiply
+from autodiff.functional import Add, MatMul, Multiply
