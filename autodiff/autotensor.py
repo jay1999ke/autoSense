@@ -27,7 +27,7 @@ class autoTensor:
             self.grad = autoTensor(value=torch.zeros(self.value.size()))
         if gradient is None:
             if self.size() == torch.rand([]).size():
-                gradient = autoTensor(torch.rand([]))
+                gradient = autoTensor(torch.zeros([]))
             else:
                 raise RuntimeError("grad must be specified for non-0-tensor")
         self.grad.value = self.grad.value + gradient.value  # type: ignore
