@@ -1,5 +1,5 @@
 import torch # emit
-from autotensor import autoTensor, autodiffNode
+from autotensor import autoTensor, Node
 import numpy as np
 
 class MatMul(autoTensor):
@@ -8,11 +8,11 @@ class MatMul(autoTensor):
         self.requires_grad = at1.requires_grad or at2.requires_grad
 
         if at1.requires_grad:
-            depend = autodiffNode(at1, self.der_pos1)
+            depend = Node(at1, self.der_pos1)
             self.at2 = at2
             self.dependencies.append(depend)
         if at2.requires_grad:
-            depend = autodiffNode(at2, self.der_pos2)
+            depend = Node(at2, self.der_pos2)
             self.at1 = at1
             self.dependencies.append(depend)
 

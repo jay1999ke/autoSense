@@ -20,25 +20,38 @@ class autoTensor:
     def __repr__(self):
         return f"autoTensor({self.value})"
 
-    def backward(self, gradient):
+    def backprop(self, gradient):
         assert self.requires_grad, "called backward on non-requires-grad tensor"
 
         if self.grad == None:
-            self.grad = autoTensor(value=torch.zeros(self.value.size()))
+            self.grad = make_autoTensor(torch.zeros(self.value.size()))
         if gradient is None:
             if self.size() == torch.rand([]).size():
-                gradient = autoTensor(torch.zeros([]))
+                gradient = autoTensor(value=torch.ones([]))
             else:
                 raise RuntimeError("grad must be specified for non-0-tensor")
         self.grad.value = self.grad.value + gradient.value  # type: ignore
 
-        for dependency in self.dependencies:
-            backward_grad = dependency.compute_gradient(gradient)
-            dependency.autoVariable.backward(backward_grad)
+        Node.dfs(dependencies = self.dependencies, gradient = gradient)
 
-class autodiffNode:    
+class Node:    
     def __init__(self, autoVariable, compute_gradient):
-        assert type(compute_gradient) == type(self.__init__), "None-callable function generated"
+        assert type(compute_gradient) == type(self.__init__), "None-Callable generated"
 
         self.autoVariable = autoVariable
         self.compute_gradient = compute_gradient
+
+    @staticmethod
+    def dfs(dependencies,gradient):
+        for dependency in dependencies:
+            if dependency.autoVariable.requires_grad:
+                back_gradient = dependency.compute_gradient(gradient)
+                dependency.autoVariable.backprop(back_gradient)
+
+def make_autoTensor(tensor):
+    if isinstance(tensor,autoTensor):
+        return tensor
+    elif isinstance(tensor,torch.Tensor):
+        return autoTensor(value=tensor)
+    elif isinstance(tensor,np.ndarray):
+        return autoTensor(value=torch.Tensor(tensor))
