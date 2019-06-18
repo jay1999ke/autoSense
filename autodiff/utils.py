@@ -15,6 +15,8 @@ def reverse_broadcast(gradient,tensor):
         if dimention == 1:
             grad_np = grad_np.sum(axis=i,keepdims=True)
     gradient.value = torch.Tensor(grad_np)
+
+    assert gradient.size() == tensor.size()
     return gradient
 
 

@@ -3,7 +3,11 @@ import torch
 import numpy as np
 
 def make_autoTensor(tensor):
-    if isinstance(tensor,autoTensor):
+    t_type = type(tensor)
+    print(t_type)
+    if t_type == int or t_type == float or t_type == bool:
+        return autoTensor(value=torch.Tensor([tensor]))
+    elif isinstance(tensor,autoTensor):
         return tensor
     elif isinstance(tensor,torch.Tensor):
         return autoTensor(value=tensor)
@@ -76,6 +80,20 @@ class autoTensor:
         self.value = self.value + make_autoTensor(other).value
         return self
 
+    def multiply(self,other):
+        return Multiply(self,make_autoTensor(other))
+
+    def Multiply(self,other):
+        return Multiply(self,make_autoTensor(other))
+    
+    def mul(self,other):
+        return Multiply(self,make_autoTensor(other))
+
+    def Mul(self,other):
+        return Multiply(self,make_autoTensor(other))
+
+
+
 class Node:    
     def __init__(self, autoVariable, compute_gradient):
         assert type(compute_gradient) == type(self.__init__), "None-Callable generated"
@@ -92,4 +110,4 @@ class Node:
 
 
 # Dealing with circular imports
-from autodiff.functional import MatMul, Add 
+from autodiff.functional import MatMul, Add, Multiply
