@@ -23,9 +23,13 @@ X, Y autoTensors require gradients whereas Z does not require gradient.
 F3 can be composed of primitive functions as below:
 
 F1 = X @ Y
+
 F2 = Y + Z
+
 F3 = F1 * F2
 
 If a autoTensor, that requires a gradient, is used to compose a child autoTensor then the child autoTensor also requires a gradient. In our example, F1, F2 and F3 all requires gradients by this property. For all functions that are composed of autoTensors that require gradients, a vjp is assigned to the reverse computational graph node. This vjp with the gradient of child autoTensor is used to obtain the gradient of a given function with respect to parent autoTensor.
+
+
 
 
