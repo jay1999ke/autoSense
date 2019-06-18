@@ -57,9 +57,6 @@ class autoTensor:
     def mm(self,other):
         return MatMul(self,make_autoTensor(other))
 
-    def matmul(self,other):
-        return MatMul(self,make_autoTensor(other))
-
     def __matmul__(self, other):
         return MatMul(self,make_autoTensor(other))
 
@@ -79,16 +76,29 @@ class autoTensor:
         self.value = self.value + make_autoTensor(other).value
         return self
 
-    def multiply(self,other):
-        return Multiply(self,make_autoTensor(other))
+    def __sub__(self, other):
+        return Substract(self,make_autoTensor(other))
+
+    def __rsub__(self, other):
+        return Substract(make_autoTensor(other),self)
+
+    def __isub__(self, other):
+        self.value = self.value - make_autoTensor(other).value
+        return self
+
+    def __neg__(self):
+        return Negate(self)
+
+    def sub(self,other):
+        return Substract(self,make_autoTensor(other))
+    
+    def Substract(self,other):
+        return Substract(self,make_autoTensor(other))
 
     def Multiply(self,other):
         return Multiply(self,make_autoTensor(other))
     
     def mul(self,other):
-        return Multiply(self,make_autoTensor(other))
-
-    def Mul(self,other):
         return Multiply(self,make_autoTensor(other))
 
     def __imul__(self, other):
@@ -121,4 +131,4 @@ class Node:
 
 
 # Dealing with circular imports
-from autodiff.functional import Add, MatMul, Multiply
+from autodiff.functional import Add, MatMul, Multiply, Negate, Substract

@@ -1,2 +1,2 @@
 from autodiff.autotensor import autoTensor
-from autodiff.functional import Add, MatMul, Multiply
+from autodiff.functional import Add, MatMul, Multiply, Negate, Substract

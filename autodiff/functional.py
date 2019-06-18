@@ -76,4 +76,40 @@ class Multiply(autoTensor):
         gradient = autoTensor(gradient.value * self.at1.value)
         gradient = reverse_broadcast(gradient,tensor).value 
         return autoTensor(value=gradient)
-        
+
+class Negate(autoTensor):
+    def __init__(self, at1):
+        super(Negate,self).__init__(-at1.value)
+        self.requires_grad = at1.requires_grad
+
+        if at1.requires_grad:
+            depend = Node(at1, self.der_pos1)
+            self.dependencies.append(depend)
+
+    def der_pos(self,gradient):
+        gradient = autoTensor(value= -gradient.value)
+        return gradient
+
+class Substract(autoTensor):
+    def __init__(self, at1, at2):
+        super(Substract,self).__init__(at1.value-at2.value)
+        self.requires_grad = at1.requires_grad or at2.requires_grad
+
+        if at1.requires_grad:
+            depend = Node(at1, self.der_pos1)
+            self.at1 = at1
+            self.dependencies.append(depend)
+        if at2.requires_grad:
+            depend = Node(at2, self.der_pos2)
+            self.at2 = at2
+            self.dependencies.append(depend)
+
+    def der_pos1(self, gradient):
+        tensor = self.at1
+        gradient = reverse_broadcast(gradient,tensor)
+        return autoTensor(value=gradient.value)
+
+    def der_pos2(self, gradient):
+        tensor = self.at2
+        gradient = reverse_broadcast(gradient,tensor)
+        return autoTensor(value= -gradient.value)
