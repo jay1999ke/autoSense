@@ -1,9 +1,11 @@
+# pylint: disable=no-name-in-module
 import torch
 import numpy as np
 import typing
 
 
 class autoTensor:
+    
     def __init__(self, value, dependents=None, requires_grad: bool = False):
         self.value = value.type(torch.FloatTensor)
         self.requires_grad = requires_grad
@@ -34,6 +36,21 @@ class autoTensor:
 
         Node.dfs(dependencies = self.dependencies, gradient = gradient)
 
+    def numpy(self):
+        return self.value.cpu().detach().numpy()
+
+    def MatMul(self,other):
+        from functional import MatMul 
+        return MatMul(self,other)
+        
+    def mm(self,other):
+        from functional import MatMul 
+        return MatMul(self,other)
+
+    def matmul(self,other):
+        from functional import MatMul 
+        return MatMul(self,other)
+
 class Node:    
     def __init__(self, autoVariable, compute_gradient):
         assert type(compute_gradient) == type(self.__init__), "None-Callable generated"
@@ -55,3 +72,6 @@ def make_autoTensor(tensor):
         return autoTensor(value=tensor)
     elif isinstance(tensor,np.ndarray):
         return autoTensor(value=torch.Tensor(tensor))
+
+
+

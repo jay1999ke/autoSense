@@ -1,6 +1,7 @@
 import torch # emit
 from autotensor import autoTensor, Node
 import numpy as np
+from utils import reverse_broadcast
 
 class MatMul(autoTensor):
     def __init__(self, at1, at2):
@@ -24,3 +25,29 @@ class MatMul(autoTensor):
     def der_pos2(self, gradient):
         value = torch.mm(self.at1.value.transpose(1,0),gradient.value)
         return autoTensor(value=value)
+
+class Add(autoTensor):
+    def __init__(self, at1, at2):
+        super(Add,self).__init__(at1.value+at2.value)
+        self.requires_grad = at1.requires_grad or at2.requires_grad
+
+        if at1.requires_grad:
+            depend = Node(at1, self.der_pos1)
+            self.at1 = at1
+            self.dependencies.append(depend)
+        if at2.requires_grad:
+            depend = Node(at2, self.der_pos2)
+            self.at2 = at2
+            self.dependencies.append(depend)
+
+    def der_pos1(self, gradient):
+        tensor = self.at1
+        gradient = reverse_broadcast(gradient,tensor)
+        return autoTensor(value=gradient.value)
+
+    def der_pos2(self, gradient):
+        tensor = self.at2
+        gradient = reverse_broadcast(gradient,tensor)
+        return autoTensor(value=gradient.value)
+
+        
