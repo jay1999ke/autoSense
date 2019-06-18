@@ -1,8 +1,16 @@
 # pylint: disable=no-name-in-module
 import torch
 import numpy as np
-import typing
 
+def make_autoTensor(tensor):
+    if isinstance(tensor,autoTensor):
+        return tensor
+    elif isinstance(tensor,torch.Tensor):
+        return autoTensor(value=tensor)
+    elif isinstance(tensor,np.ndarray):
+        return autoTensor(value=torch.Tensor(tensor))
+    else:
+        return autoTensor(value=torch.Tensor(tensor))
 
 class autoTensor:
     
@@ -15,6 +23,7 @@ class autoTensor:
             self.dependencies = []
         else:
             self.dependencies = dependents
+    
 
     def size(self):
         return f"autoTensor({self.value.size()})"
@@ -40,16 +49,32 @@ class autoTensor:
         return self.value.cpu().detach().numpy()
 
     def MatMul(self,other):
-        from functional import MatMul 
-        return MatMul(self,other)
+        return MatMul(self,make_autoTensor(other))
         
     def mm(self,other):
-        from functional import MatMul 
-        return MatMul(self,other)
+        return MatMul(self,make_autoTensor(other))
 
     def matmul(self,other):
-        from functional import MatMul 
-        return MatMul(self,other)
+        return MatMul(self,make_autoTensor(other))
+
+    def __matmul__(self, other):
+        return MatMul(self,make_autoTensor(other))
+
+    def add(self,other):
+        return Add(self,make_autoTensor(other))
+
+    def Add(self,other):
+        return Add(self,make_autoTensor(other))
+
+    def __add__(self, other):
+        return Add(self,make_autoTensor(other))
+
+    def __radd__(self, other):
+        return Add(self,make_autoTensor(other))
+
+    def __iadd__(self, other):
+        self.value = self.value + make_autoTensor(other).value
+        return self
 
 class Node:    
     def __init__(self, autoVariable, compute_gradient):
@@ -65,13 +90,6 @@ class Node:
                 back_gradient = dependency.compute_gradient(gradient)
                 dependency.autoVariable.backprop(back_gradient)
 
-def make_autoTensor(tensor):
-    if isinstance(tensor,autoTensor):
-        return tensor
-    elif isinstance(tensor,torch.Tensor):
-        return autoTensor(value=tensor)
-    elif isinstance(tensor,np.ndarray):
-        return autoTensor(value=torch.Tensor(tensor))
 
-
-
+# Dealing with circular imports
+from autodiff.functional import MatMul, Add 

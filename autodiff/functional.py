@@ -1,7 +1,6 @@
-import torch # emit
-from autotensor import autoTensor, Node
-import numpy as np
-from utils import reverse_broadcast
+import torch
+from autodiff.autotensor import autoTensor, Node
+from autodiff.utils import reverse_broadcast
 
 class MatMul(autoTensor):
     def __init__(self, at1, at2):
