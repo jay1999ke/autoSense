@@ -34,6 +34,10 @@ class autoTensor:
     def __repr__(self):
         return f"autoTensor(\n{self.value})\n"
 
+    def grad_zeros(self):
+        if self.grad != None:
+            self.grad.value = self.grad.value * 0
+
     def backprop(self, gradient):
         assert self.requires_grad, "called backward on non-requires-grad tensor"
 
@@ -47,6 +51,10 @@ class autoTensor:
         self.grad.value = self.grad.value + gradient.value  # type: ignore
 
         Node.dfs(dependencies = self.dependencies, gradient = gradient)
+    
+    def grad_sweep(self):
+        self.grad_zeros()
+        Node.dfs_grad(self.dependencies)
 
     def numpy(self):
         return self.value.cpu().detach().numpy()
@@ -129,6 +137,12 @@ class Node:
                 back_gradient = dependency.compute_gradient(gradient)
                 dependency.autoVariable.backprop(back_gradient)
 
+    @staticmethod
+    def dfs_grad(dependencies):
+        """This is where the magic happens"""
+        for dependency in dependencies:
+            if dependency.autoVariable.requires_grad:
+                dependency.autoVariable.grad_sweep()
 
 # Dealing with circular imports
 from autodiff.functional import Add, MatMul, Multiply, Negate, Substract

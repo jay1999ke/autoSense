@@ -23,35 +23,33 @@ if __name__ == "__main__":
 
     X = autoTensor(torch.Tensor(X).type(torch.FloatTensor))
     y = autoTensor(torch.Tensor(y).type(torch.FloatTensor))
-    _y = autoTensor(torch.Tensor(_y).type(torch.FloatTensor))
 
     w = autoTensor(torch.rand(1,1) *0.09,requires_grad=True) 
     b = autoTensor(torch.rand(1,1)* 0.09,requires_grad=True)
 
 
     h = (X * w) + b
-    grad = h + _y
+    grad = h -y
     grad.requires_grad = False
     h.backprop(grad)
 
-    lr = 0.000000000001
+    lr = 0.0001
 
-    for x in range(32000):
+    for x in range(2000):
 
         h = (X * w) + b
-        grad = h + _y
+        grad = h - y
         grad.requires_grad = False
         h.backprop(grad)
 
         w.value -= lr* w.grad.value
         b.value -= lr* b.grad.value
-        if x%1000 == 0:
+
+        grad.grad_sweep()
+
+        if x%200 == 0:
             loss = 0.5*torch.sum((h.value - y.value)**2)
             print(x,"\t","loss: ",loss)
-            if x == 18000:
-                lr /=10
-            if loss < 5:
-                break
     print(x,"loss: ",loss)
 
     w = w.numpy()[0]
