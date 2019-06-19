@@ -19,7 +19,6 @@ if __name__ == "__main__":
 
     #plt.scatter(X[:, 0], y)
     #plt.show()
-    _y = -1*y
 
     X = autoTensor(torch.Tensor(X).type(torch.FloatTensor))
     y = autoTensor(torch.Tensor(y).type(torch.FloatTensor))

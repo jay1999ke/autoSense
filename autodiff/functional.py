@@ -113,3 +113,22 @@ class Substract(autoTensor):
         tensor = self.at2
         gradient = reverse_broadcast(gradient,tensor)
         return autoTensor(value= -gradient.value)
+
+class Power(autoTensor):
+    def __init__(self, at1, pow_val):
+        super(Power,self).__init__(at1.value**pow_val.value)
+
+        self.requires_grad = at1.requires_grad
+
+        if at1.requires_grad:
+            depend = Node(at1, self.der_pos1)
+            self.at1 = at1
+            self.pow_val = pow_val
+            self.dependencies.append(depend)
+
+    def der_pos1(self, gradient):
+        tensor = self.at1
+        pow_val = self.pow_val
+        gradient = reverse_broadcast(gradient,tensor)
+        back_grad = pow_val.value * gradient.value * (tensor.value**(pow_val.value-1))
+        return autoTensor(value=back_grad)

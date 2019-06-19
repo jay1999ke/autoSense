@@ -119,6 +119,9 @@ class autoTensor:
     def __rmul__(self, other):
         return Multiply(self,make_autoTensor(other))
 
+    def __pow__(self,power):
+        return Power(self,make_autoTensor(power))
+
 class Node:   
     """Node for a reverse computation graph"""
 
@@ -145,4 +148,4 @@ class Node:
                 dependency.autoVariable.grad_sweep()
 
 # Dealing with circular imports
-from autodiff.functional import Add, MatMul, Multiply, Negate, Substract
+from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power
