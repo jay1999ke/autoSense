@@ -176,3 +176,53 @@ class Sum(autoTensor):
     def der_pos1(self, gradient):
         back_grad = gradient.value * torch.ones(self.shape)
         return autoTensor(value=back_grad)
+
+
+class tanh(autoTensor):
+    def __init__(self,at1):
+        super(tanh,self).__init__(torch.tanh(at1.value))
+
+        self.requires_grad = at1.requires_grad
+
+        if at1.requires_grad:
+            depend = Node(at1, self.der_pos1)
+            self.dependencies.append(depend)
+
+    def der_pos1(self, gradient):
+        assert self.value.size() == gradient.value.size()    
+        back_grad = gradient.value * (1-self.value**2)
+        return autoTensor(value=back_grad)
+
+class sigmoid(autoTensor):
+    def __init__(self,at1):
+        super(sigmoid,self).__init__(torch.sigmoid(at1.value))
+
+        self.requires_grad = at1.requires_grad
+
+        if at1.requires_grad:
+            depend = Node(at1, self.der_pos1)
+            self.dependencies.append(depend)
+
+    def der_pos1(self, gradient):
+        assert self.value.size() == gradient.value.size()
+        back_grad = gradient.value * (self.value*(1-self.value))
+        return autoTensor(value=back_grad)
+
+class relu(autoTensor):
+    def __init__(self,at1):
+        super(relu,self).__init__(torch.relu(at1.value))
+
+        self.requires_grad = at1.requires_grad
+
+        if at1.requires_grad:
+            depend = Node(at1, self.der_pos1)
+            self.dependencies.append(depend)
+
+    def der_pos1(self, gradient):
+        assert self.value.size() == gradient.value.size()
+        sub_grad = self.value.clone()
+        sub_grad[sub_grad > 0] = 1
+        back_grad = gradient.value * sub_grad
+        return autoTensor(value=back_grad)
+
+

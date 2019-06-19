@@ -168,7 +168,6 @@ class Node:
 
     @staticmethod
     def dfs_grad(dependencies):
-        """This is where the magic happens"""
         for dependency in dependencies:
             if dependency.autoVariable.requires_grad:
                 dependency.autoVariable.grad_sweep()

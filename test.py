@@ -1,8 +1,10 @@
+# pylint: disable=no-name-in-module,no-member
 """this file is to be scapped later"""
 
 import torch
 from autodiff import autoTensor, MatMul, Add, Multiply
 import numpy as np
+import autodiff
 
 
 """
@@ -102,14 +104,58 @@ t3.backprop(grad)
 print(t1.grad)
 
 print(t2.grad)
-"""
+""
 # sum test
 
 t1 = autoTensor(torch.Tensor([[1, 2, 3],[1, 2, 3]]), requires_grad=True)
-t2 = t1.sum(axis=1)
+t2 = t1.sum(axis=0)
 print(t2)
 
 grad = autoTensor(torch.Tensor([3]))
 t2.backprop(grad)
 
 print(t1.grad)
+""
+
+# tanh test
+
+t1 = autoTensor(torch.Tensor([[1, 2, 3],[1, 2, 3]]), requires_grad=True)
+
+t2 = autodiff.tanh(t1)
+
+grad = autoTensor(torch.Tensor([[1, 1, 1],[1, 1, 1]]))
+t2.backprop(grad)
+
+print(t2)
+
+print(t1.grad)
+""
+
+# sigmoid test
+
+t1 = autoTensor(torch.Tensor([[1, 2, 3],[1, 2, 3]]), requires_grad=True)
+
+t2 = autodiff.sigmoid(t1)
+
+grad = autoTensor(torch.Tensor([[2, 1, 1],[1, 1, 1]]))
+t2.backprop(grad)
+
+print(t2)
+
+print(t1.grad)
+
+"""
+
+# relu test
+
+t1 = autoTensor(torch.Tensor([[-1, 2, 3],[1, -2, -3]]), requires_grad=True)
+
+t2 = autodiff.relu(t1)
+
+grad = autoTensor(torch.Tensor([[2, 8, 1],[1, 1, 9]]))
+t2.backprop(grad)
+
+print(t2)
+
+print(t1.grad)
+
