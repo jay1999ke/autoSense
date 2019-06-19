@@ -30,15 +30,15 @@ def make_torchTensor(tensor):
 
 class autoTensor:
     
-    def __init__(self, value, composers=None, requires_grad: bool = False):
+    def __init__(self, value, channels=None, requires_grad: bool = False):
         self.value = make_torchTensor(value).type(torch.FloatTensor)
         self.requires_grad = requires_grad
         self.grad = None
 
-        if composers is None:
-            self.composers = []
+        if channels is None:
+            self.channels = []
         else:
-            self.composers = composers
+            self.channels = channels
     
 
     def size(self):
@@ -63,11 +63,11 @@ class autoTensor:
                 raise RuntimeError("grad must be specified for non-0-tensor")
         self.grad.value = self.grad.value + gradient.value  # type: ignore
 
-        Node.dfs(composers = self.composers, gradient = gradient)
+        Node.dfs(channels = self.channels, gradient = gradient)
     
     def grad_sweep(self):
         self.grad_zeros()
-        Node.dfs_grad(self.composers)
+        Node.dfs_grad(self.channels)
 
     def numpy(self):
         return self.value.cpu().detach().numpy()
@@ -152,25 +152,25 @@ class Node:
     """Node for a reverse computation graph"""
 
     def __init__(self, autoVariable, vjp):
-        """A node holds a composer variable and a vjp"""
+        """A node holds a back_channel variable and a vjp"""
         assert type(vjp) == type(self.__init__), "None-Callable generated"
 
         self.autoVariable = autoVariable
         self.vjp = vjp
 
     @staticmethod
-    def dfs(composers,gradient):
+    def dfs(channels,gradient):
         """This is where the magic happens"""
-        for composer in composers:
-            if composer.autoVariable.requires_grad:
-                back_gradient = composer.vjp(gradient)
-                composer.autoVariable.backprop(back_gradient)
+        for back_channel in channels:
+            if back_channel.autoVariable.requires_grad:
+                back_gradient = back_channel.vjp(gradient)
+                back_channel.autoVariable.backprop(back_gradient)
 
     @staticmethod
-    def dfs_grad(composers):
-        for composer in composers:
-            if composer.autoVariable.requires_grad:
-                composer.autoVariable.grad_sweep()
+    def dfs_grad(channels):
+        for back_channel in channels:
+            if back_channel.autoVariable.requires_grad:
+                back_channel.autoVariable.grad_sweep()
 
 # Dealing with circular imports
 from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum
