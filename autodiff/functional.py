@@ -161,3 +161,18 @@ class Power(autoTensor):
         gradient = reverse_broadcast(gradient,tensor)
         back_grad = pow_val.value * gradient.value * (tensor.value**(pow_val.value-1))
         return autoTensor(value=back_grad)
+
+class Sum(autoTensor):
+    def __init__(self, at1, axis):
+        super(Sum,self).__init__(at1.value.sum(dim=axis,keepdim=True))
+
+        self.requires_grad = at1.requires_grad
+
+        if at1.requires_grad:
+            depend = Node(at1, self.der_pos1)
+            self.shape = at1.value.size()
+            self.dependencies.append(depend)
+
+    def der_pos1(self, gradient):
+        back_grad = gradient.value * torch.ones(self.shape)
+        return autoTensor(value=back_grad)

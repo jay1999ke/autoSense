@@ -15,10 +15,23 @@ def make_autoTensor(tensor):
     else:
         return autoTensor(value=torch.Tensor(tensor))
 
+def make_torchTensor(tensor):
+    t_type = type(tensor)
+    if t_type == int or t_type == float or t_type == bool:
+        return torch.Tensor([tensor])
+    elif isinstance(tensor,autoTensor):
+        return tensor.value
+    elif isinstance(tensor,torch.Tensor):
+        return tensor
+    elif isinstance(tensor,np.ndarray):
+        return torch.Tensor(tensor)
+    else:
+        return torch.Tensor(tensor)
+
 class autoTensor:
     
     def __init__(self, value, dependents=None, requires_grad: bool = False):
-        self.value = value.type(torch.FloatTensor)
+        self.value = make_torchTensor(value).type(torch.FloatTensor)
         self.requires_grad = requires_grad
         self.grad = None
 
@@ -132,22 +145,25 @@ class autoTensor:
         self.value = self.value / make_autoTensor(other).value
         return self
 
+    def sum(self,axis=0):
+        return Sum(self,axis)
+
 class Node:   
     """Node for a reverse computation graph"""
 
-    def __init__(self, autoVariable, compute_gradient):
+    def __init__(self, autoVariable, vjp):
         """A node holds a dependent variable and a vjp"""
-        assert type(compute_gradient) == type(self.__init__), "None-Callable generated"
+        assert type(vjp) == type(self.__init__), "None-Callable generated"
 
         self.autoVariable = autoVariable
-        self.compute_gradient = compute_gradient
+        self.vjp = vjp
 
     @staticmethod
     def dfs(dependencies,gradient):
         """This is where the magic happens"""
         for dependency in dependencies:
             if dependency.autoVariable.requires_grad:
-                back_gradient = dependency.compute_gradient(gradient)
+                back_gradient = dependency.vjp(gradient)
                 dependency.autoVariable.backprop(back_gradient)
 
     @staticmethod
@@ -158,4 +174,4 @@ class Node:
                 dependency.autoVariable.grad_sweep()
 
 # Dealing with circular imports
-from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide
+from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum
