@@ -8,13 +8,13 @@ class MatMul(autoTensor):
         self.requires_grad = at1.requires_grad or at2.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
+            composer = Node(at1, self.der_pos1)
             self.at2 = at2
-            self.dependencies.append(depend)
+            self.composers.append(composer)
         if at2.requires_grad:
-            depend = Node(at2, self.der_pos2)
+            composer = Node(at2, self.der_pos2)
             self.at1 = at1
-            self.dependencies.append(depend)
+            self.composers.append(composer)
 
 
     def der_pos1(self, gradient):
@@ -31,13 +31,13 @@ class Add(autoTensor):
         self.requires_grad = at1.requires_grad or at2.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
+            composer = Node(at1, self.der_pos1)
             self.at1 = at1
-            self.dependencies.append(depend)
+            self.composers.append(composer)
         if at2.requires_grad:
-            depend = Node(at2, self.der_pos2)
+            composer = Node(at2, self.der_pos2)
             self.at2 = at2
-            self.dependencies.append(depend)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         tensor = self.at1
@@ -55,15 +55,15 @@ class Multiply(autoTensor):
         self.requires_grad = at1.requires_grad or at2.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
+            composer = Node(at1, self.der_pos1)
             self.at1 = at1
             self.at2 = at2
-            self.dependencies.append(depend)
+            self.composers.append(composer)
         if at2.requires_grad:
-            depend = Node(at2, self.der_pos2)
+            composer = Node(at2, self.der_pos2)
             self.at2 = at2
             self.at1 = at1
-            self.dependencies.append(depend)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         tensor = self.at1
@@ -83,15 +83,15 @@ class Divide(autoTensor):
         self.requires_grad = at1.requires_grad or at2.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
+            composer = Node(at1, self.der_pos1)
             self.at1 = at1
             self.at2 = at2
-            self.dependencies.append(depend)
+            self.composers.append(composer)
         if at2.requires_grad:
-            depend = Node(at2, self.der_pos2)
+            composer = Node(at2, self.der_pos2)
             self.at2 = at2
             self.at1 = at1
-            self.dependencies.append(depend)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         tensor = self.at1
@@ -112,8 +112,8 @@ class Negate(autoTensor):
         self.requires_grad = at1.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
-            self.dependencies.append(depend)
+            composer = Node(at1, self.der_pos1)
+            self.composers.append(composer)
 
     def der_pos(self,gradient):
         gradient = autoTensor(value= -gradient.value)
@@ -125,13 +125,13 @@ class Substract(autoTensor):
         self.requires_grad = at1.requires_grad or at2.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
+            composer = Node(at1, self.der_pos1)
             self.at1 = at1
-            self.dependencies.append(depend)
+            self.composers.append(composer)
         if at2.requires_grad:
-            depend = Node(at2, self.der_pos2)
+            composer = Node(at2, self.der_pos2)
             self.at2 = at2
-            self.dependencies.append(depend)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         tensor = self.at1
@@ -150,10 +150,10 @@ class Power(autoTensor):
         self.requires_grad = at1.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
+            composer = Node(at1, self.der_pos1)
             self.at1 = at1
             self.pow_val = pow_val
-            self.dependencies.append(depend)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         tensor = self.at1
@@ -169,9 +169,9 @@ class Sum(autoTensor):
         self.requires_grad = at1.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
+            composer = Node(at1, self.der_pos1)
             self.shape = at1.value.size()
-            self.dependencies.append(depend)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         back_grad = gradient.value * torch.ones(self.shape)
@@ -185,8 +185,8 @@ class tanh(autoTensor):
         self.requires_grad = at1.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
-            self.dependencies.append(depend)
+            composer = Node(at1, self.der_pos1)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         assert self.value.size() == gradient.value.size()    
@@ -200,8 +200,8 @@ class sigmoid(autoTensor):
         self.requires_grad = at1.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
-            self.dependencies.append(depend)
+            composer = Node(at1, self.der_pos1)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         assert self.value.size() == gradient.value.size()
@@ -215,8 +215,8 @@ class relu(autoTensor):
         self.requires_grad = at1.requires_grad
 
         if at1.requires_grad:
-            depend = Node(at1, self.der_pos1)
-            self.dependencies.append(depend)
+            composer = Node(at1, self.der_pos1)
+            self.composers.append(composer)
 
     def der_pos1(self, gradient):
         assert self.value.size() == gradient.value.size()
