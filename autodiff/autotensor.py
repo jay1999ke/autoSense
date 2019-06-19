@@ -122,6 +122,16 @@ class autoTensor:
     def __pow__(self,power):
         return Power(self,make_autoTensor(power))
 
+    def __truediv__(self,other):
+        return Divide(self,make_autoTensor(other))
+
+    def __rtruediv__(self,other):
+        return Divide(make_autoTensor(other),self)
+
+    def __itruediv__(self,other):
+        self.value = self.value / make_autoTensor(other).value
+        return self
+
 class Node:   
     """Node for a reverse computation graph"""
 
@@ -148,4 +158,4 @@ class Node:
                 dependency.autoVariable.grad_sweep()
 
 # Dealing with circular imports
-from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power
+from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide

@@ -70,7 +70,7 @@ t3.backprop(grad)
 print(t1.grad)
 
 print(t2.grad)
-"""
+""
 #power test
 t1 = autoTensor(torch.Tensor([[1, 2, 3], [4, 5, 6]]), requires_grad = True)    # (2, 3)
 t2 = autoTensor(torch.Tensor([2, 2, 2]), requires_grad = True)               # (1, 3)
@@ -80,6 +80,22 @@ t3 = t1**t2
 print(t3)
 
 grad = autoTensor(torch.Tensor([[1, 2, 1], [1, 1, 2]]))
+
+t3.backprop(grad)
+
+print(t1.grad)
+
+print(t2.grad)
+"""
+#div test
+t1 = autoTensor(torch.Tensor([[1, 2, 3], [4, 5, 6]]), requires_grad = True)    # (2, 3)
+t2 = autoTensor(torch.Tensor([7, 8, 9]), requires_grad = True)               # (1, 3)
+
+t3 = t1/t2
+
+print(t3)
+
+grad = autoTensor(torch.Tensor([[1, 1, 1], [1, 1, 1]]))
 
 t3.backprop(grad)
 
