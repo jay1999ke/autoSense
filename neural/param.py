@@ -1,4 +1,4 @@
-from autodiff import autoTensor
+from autodiff.autotensor import autoTensor
 import torch
 
 class Weight(autoTensor):

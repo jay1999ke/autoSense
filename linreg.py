@@ -1,5 +1,6 @@
 import numpy as np
 from autodiff import autoTensor
+from neural import Loss
 import matplotlib.pyplot as plt
 import torch
 
@@ -25,30 +26,21 @@ if __name__ == "__main__":
     w2 = autoTensor(torch.rand(1,1) *0.09,requires_grad=True) 
     b = autoTensor(torch.rand(1,1)* 0.09,requires_grad=True)
 
-
-    h = (X * w + X2*w2) + b
-    grad = h - y
-    grad.requires_grad = False
-    h.backprop(grad)
-    z = h
-
     lr = 0.000001
 
     for x in range(60000):
 
         h = (X * w + X2*w2) + b
-        grad = h - y
-        grad.requires_grad = False
-        h.backprop(grad)
+        loss = Loss.SquareError(h,y)
+        loss.backward()
 
         w.value -= lr* w.grad.value
         b.value -= lr* b.grad.value
         w2.value -= lr*w2.grad.value
 
         if x%3000 == 0:
-            loss = 0.5*torch.sum((h.value - y.value)**2)
             print(x,"\t","loss: ",loss)
-        grad.grad_sweep()
+        loss.grad_sweep()
 
     print(x,"loss: ",loss)
 

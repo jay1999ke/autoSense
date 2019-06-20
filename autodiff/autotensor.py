@@ -45,8 +45,7 @@ class autoTensor(object):
         if channels is None:
             self.channels = []
         else:
-            self.channels = channels
-    
+            self.channels = channels    
 
     def size(self):
         return self.value.size()
@@ -61,18 +60,19 @@ class autoTensor(object):
     def backprop(self, gradient):
         """Propagates appropriate gradient to local reverse computational sub-graph"""
 
-        assert self.requires_grad, "called backward on non-requires-grad tensor"
-
+        if not self.requires_grad:
+            raise RuntimeError("Gradient called on a non-differntiable variable")
+        
         if self.grad == None:
             self.grad = make_autoTensor(torch.zeros(self.value.size()))
+
         if gradient is None:
-            if isinstance(self,Loss):
-                gradient = autoTensor(value=torch.ones(self.value.size()))
-            elif self.size() == torch.rand([]).size():
+            if self.size() == torch.rand([]).size():
                 gradient = autoTensor(value=torch.ones([]))
             else:
-                raise RuntimeError("grad must be specified for non-0-tensor")
-        self.grad.value = self.grad.value + gradient.value  # type: ignore
+                raise RuntimeError("Gradient not provided")
+
+        self.grad.value = self.grad.value + gradient.value 
 
         Node.dfs(channels = self.channels, gradient = gradient)
     
