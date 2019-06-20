@@ -3,7 +3,7 @@ from autodiff.autotensor import autoTensor
 import numpy as np
 
 def reverse_broadcast(gradient,tensor):
-    grad_np = gradient.numpy()
+    grad_np = gradient.value.clone().numpy()
 
     #when tensor was broadcasted by extending dimenstions
     number_of_added_dimentions = len(gradient.value.size()) - len(tensor.value.size() )

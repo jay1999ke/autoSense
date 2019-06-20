@@ -16,7 +16,6 @@ class MatMul(autoTensor):
             self.tensor1 = tensor1
             self.channels.append(back_channel)
 
-
     def der_pos1(self, gradient):
         value = torch.mm(gradient.value,self.tensor2.value.transpose(1,0))
         return autoTensor(value=value)

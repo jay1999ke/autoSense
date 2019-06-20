@@ -3,9 +3,6 @@ from autodiff import autoTensor
 import matplotlib.pyplot as plt
 import torch
 
-
-
-
 if __name__ == "__main__":
 
     data = np.matrix(np.genfromtxt("testdata/ex1data1.txt", delimiter=','))
@@ -33,6 +30,7 @@ if __name__ == "__main__":
     grad = h - y
     grad.requires_grad = False
     h.backprop(grad)
+    z = h
 
     lr = 0.000001
 
@@ -46,7 +44,7 @@ if __name__ == "__main__":
         w.value -= lr* w.grad.value
         b.value -= lr* b.grad.value
         w2.value -= lr*w2.grad.value
-        
+
         if x%3000 == 0:
             loss = 0.5*torch.sum((h.value - y.value)**2)
             print(x,"\t","loss: ",loss)

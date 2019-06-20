@@ -57,7 +57,9 @@ class autoTensor:
         if self.grad == None:
             self.grad = make_autoTensor(torch.zeros(self.value.size()))
         if gradient is None:
-            if self.size() == torch.rand([]).size():
+            if isinstance(self,Loss):
+                gradient = autoTensor(value=torch.ones(self.value.size()))
+            elif self.size() == torch.rand([]).size():
                 gradient = autoTensor(value=torch.ones([]))
             else:
                 raise RuntimeError("grad must be specified for non-0-tensor")
@@ -171,6 +173,11 @@ class Node:
         for back_channel in channels:
             if back_channel.autoVariable.requires_grad:
                 back_channel.autoVariable.grad_sweep()
+
+class Loss(autoTensor):
+    def __init__(self,value):
+        super(Loss,self).__init__(value=value, channels=None, requires_grad = False)
+
 
 # Dealing with circular imports
 from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum
