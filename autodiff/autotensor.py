@@ -28,7 +28,7 @@ def make_torchTensor(tensor):
     else:
         return torch.Tensor(tensor)
 
-class autoTensor:
+class autoTensor(object):
     
     def __init__(self, value, channels=None, requires_grad: bool = False):
         self.value = make_torchTensor(value).type(torch.FloatTensor)
@@ -42,7 +42,7 @@ class autoTensor:
     
 
     def size(self):
-        return f"autoTensor({self.value.size()})"
+        return self.value.size()
 
     def __repr__(self):
         return f"autoTensor(\n{self.value})\n"
@@ -150,7 +150,7 @@ class autoTensor:
     def sum(self,axis=0):
         return Sum(self,axis)
 
-class Node:   
+class Node(object):   
     """Node for a reverse computation graph"""
 
     def __init__(self, autoVariable, vjp):
@@ -174,10 +174,12 @@ class Node:
             if back_channel.autoVariable.requires_grad:
                 back_channel.autoVariable.grad_sweep()
 
-class Loss(autoTensor):
-    def __init__(self,value):
-        super(Loss,self).__init__(value=value, channels=None, requires_grad = False)
-
+    @staticmethod
+    def dfs_update_param(channels,learning_rate):
+        for back_channel in channels:
+            if back_channel.autoVariable.requires_grad and isinstance(back_channel.autoVariable,Weight):
+                back_channel.autoVariable.update_weights()
 
 # Dealing with circular imports
 from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum
+from neural import Weight, Loss

@@ -111,7 +111,7 @@ class Negate(autoTensor):
         self.requires_grad = tensor1.requires_grad
 
         if tensor1.requires_grad:
-            back_channel = Node(tensor1, self.der_pos1)
+            back_channel = Node(tensor1, self.der_pos)
             self.channels.append(back_channel)
 
     def der_pos(self,gradient):
