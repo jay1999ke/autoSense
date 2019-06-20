@@ -3,6 +3,8 @@ from autodiff.autotensor import autoTensor, Node
 from autodiff.utils import reverse_broadcast
 
 class MatMul(autoTensor):
+    """Matrix multiplication "autoTensor" function"""
+
     def __init__(self, tensor1, tensor2):
         super(MatMul,self).__init__(torch.mm(tensor1.value,tensor2.value))
         self.requires_grad = tensor1.requires_grad or tensor2.requires_grad
@@ -25,6 +27,8 @@ class MatMul(autoTensor):
         return autoTensor(value=value)
 
 class Add(autoTensor):
+    """Addition "autoTensor" function"""
+
     def __init__(self, tensor1, tensor2):
         super(Add,self).__init__(tensor1.value+tensor2.value)
         self.requires_grad = tensor1.requires_grad or tensor2.requires_grad
@@ -49,6 +53,8 @@ class Add(autoTensor):
         return autoTensor(value=gradient.value)
 
 class Multiply(autoTensor):
+    """Multiplication "autoTensor" function"""
+
     def __init__(self, tensor1, tensor2):
         super(Multiply,self).__init__(tensor1.value*tensor2.value)
         self.requires_grad = tensor1.requires_grad or tensor2.requires_grad
@@ -77,6 +83,8 @@ class Multiply(autoTensor):
         return autoTensor(value=gradient)
 
 class Divide(autoTensor):
+    """Division "autoTensor" function"""
+
     def __init__(self, tensor1, tensor2):
         super(Divide,self).__init__(tensor1.value/tensor2.value)
         self.requires_grad = tensor1.requires_grad or tensor2.requires_grad
@@ -106,6 +114,8 @@ class Divide(autoTensor):
 
 
 class Negate(autoTensor):
+    """Negative "autoTensor" function"""
+
     def __init__(self, tensor1):
         super(Negate,self).__init__(-tensor1.value)
         self.requires_grad = tensor1.requires_grad
@@ -119,6 +129,8 @@ class Negate(autoTensor):
         return gradient
 
 class Substract(autoTensor):
+    """Substraction "autoTensor" function"""
+
     def __init__(self, tensor1, tensor2):
         super(Substract,self).__init__(tensor1.value-tensor2.value)
         self.requires_grad = tensor1.requires_grad or tensor2.requires_grad
@@ -143,6 +155,8 @@ class Substract(autoTensor):
         return autoTensor(value= -gradient.value)
 
 class Power(autoTensor):
+    """Power "autoTensor" function"""
+
     def __init__(self, tensor1, pow_val):
         super(Power,self).__init__(tensor1.value**pow_val.value)
 
@@ -162,6 +176,8 @@ class Power(autoTensor):
         return autoTensor(value=back_grad)
 
 class Sum(autoTensor):
+    """Elements sum "autoTensor" function"""
+
     def __init__(self, tensor1, axis):
         super(Sum,self).__init__(tensor1.value.sum(dim=axis,keepdim=True))
 
@@ -178,6 +194,8 @@ class Sum(autoTensor):
 
 
 class tanh(autoTensor):
+    """tanh"autoTensor" function"""
+
     def __init__(self,tensor1):
         super(tanh,self).__init__(torch.tanh(tensor1.value))
 
@@ -193,6 +211,8 @@ class tanh(autoTensor):
         return autoTensor(value=back_grad)
 
 class sigmoid(autoTensor):
+    """sigmoid "autoTensor" function"""
+
     def __init__(self,tensor1):
         super(sigmoid,self).__init__(torch.sigmoid(tensor1.value))
 
@@ -208,6 +228,8 @@ class sigmoid(autoTensor):
         return autoTensor(value=back_grad)
 
 class relu(autoTensor):
+    """ReLU "autoTensor" function"""
+
     def __init__(self,tensor1):
         super(relu,self).__init__(torch.relu(tensor1.value))
 

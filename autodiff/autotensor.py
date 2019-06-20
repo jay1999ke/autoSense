@@ -3,6 +3,9 @@ import torch
 import numpy as np
 
 def make_autoTensor(tensor):
+    """Ensures that incoming object is an autoTensor,
+    otherwise it converts object to tensor if possibe"""
+
     t_type = type(tensor)
     if t_type == int or t_type == float or t_type == bool:
         return autoTensor(value=torch.Tensor([tensor]))
@@ -16,6 +19,9 @@ def make_autoTensor(tensor):
         return autoTensor(value=torch.Tensor(tensor))
 
 def make_torchTensor(tensor):
+    """Ensures that incoming object is an torch.Tensor,
+    otherwise it converts object to tensor if possibe"""
+
     t_type = type(tensor)
     if t_type == int or t_type == float or t_type == bool:
         return torch.Tensor([tensor])
@@ -29,6 +35,7 @@ def make_torchTensor(tensor):
         return torch.Tensor(tensor)
 
 class autoTensor(object):
+    """autoTensor is the basic building block for the automatic diffentiation system"""
     
     def __init__(self, value, channels=None, requires_grad: bool = False):
         self.value = make_torchTensor(value).type(torch.FloatTensor)
@@ -52,6 +59,8 @@ class autoTensor(object):
             self.grad.value = self.grad.value * 0
 
     def backprop(self, gradient):
+        """Propagates appropriate gradient to local reverse computational sub-graph"""
+
         assert self.requires_grad, "called backward on non-requires-grad tensor"
 
         if self.grad == None:
@@ -68,6 +77,8 @@ class autoTensor(object):
         Node.dfs(channels = self.channels, gradient = gradient)
     
     def grad_sweep(self):
+        """Clears gradient values to zero in the local reverse computational sub-graph"""
+        
         self.grad_zeros()
         Node.dfs_grad(self.channels)
 
