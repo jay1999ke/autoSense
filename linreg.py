@@ -1,6 +1,6 @@
 import numpy as np
 from autodiff import autoTensor
-from neural import Loss, Weight
+from neural import Loss, Weight, Initializer
 import matplotlib.pyplot as plt
 import torch
 
@@ -18,13 +18,14 @@ if __name__ == "__main__":
     #plt.scatter(X[:, 0], y)
     #plt.show()
 
-    X = autoTensor(torch.Tensor(X).type(torch.FloatTensor))
-    X2 = autoTensor(torch.Tensor(X2).type(torch.FloatTensor))    
-    y = autoTensor(torch.Tensor(y).type(torch.FloatTensor))
+    X = autoTensor(X)
+    X2 = autoTensor(X2)    
+    y = autoTensor(y)
 
-    w = autoTensor(torch.rand(1,1) *0.09,requires_grad=True) 
-    w2 = autoTensor(torch.rand(1,1) *0.09,requires_grad=True) 
-    b = autoTensor(torch.rand(1,1)* 0.09,requires_grad=True)
+    initer = Initializer("he")
+    w = Weight(shape=(1,1),initializer=initer)
+    w2 = Weight(shape=(1,1),initializer=initer)
+    b = Weight(shape=(1,1),initializer=initer)
 
     lr = 0.000001
 

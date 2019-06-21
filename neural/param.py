@@ -19,6 +19,7 @@ class Weight(autoTensor):
 # Implementation of all kinds of initialization techniques
 
 class Initializer(object):
+    """Weights initializer"""
     
     def __init__(self,init_type):
         self.init_type = init_type.lower()
