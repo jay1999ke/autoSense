@@ -31,11 +31,11 @@ class SquareError(Loss):
         return f"Cost : autoTensor({value})"
 
 
-class AbsoluteError(Loss):
-    """Produces Square error loss of Model"""
+class MeanAbsoluteError(Loss):
+    """Produces MAE loss of Model"""
 
     def __init__(self,y_pred,y_target):
-        super(SquareError,self).__init__(value = torch.abs(y_pred.value-y_target.value))
+        super(MeanAbsoluteError,self).__init__(value = torch.abs(y_pred.value-y_target.value))
         self.y_pred = y_pred
         self.y_target = y_target
 
@@ -43,18 +43,19 @@ class AbsoluteError(Loss):
         self.channels.append(back_channel)
 
     def der(self,gradient):
-        value = y_pred - y_target
+        value = self.y_pred.value - self.y_target.value
         value = value/torch.abs(value)  
         return autoTensor(value=value)
 
     def __repr__(self):
-        value = torch.sum(self.value)
+        value = torch.sum(self.value)/self.value.size()[0]
         return f"Cost : autoTensor({value})"
 
 
 class BinaryCrossEntropy(Loss):
+    """Produces BinaryCrossEntropy loss of a model"""
     def __init__(self, y_pred, y_target):
-        super(Loss, self).__init__(value = -(y_target.value*torch.log(y_pred.value)) + (1 - y_target.value)*torch.log(1 - y_pred.value))
+        super(BinaryCrossEntropy, self).__init__(value = -(y_target.value*torch.log(y_pred.value)) + (1 - y_target.value)*torch.log(1 - y_pred.value))
         self.y_pred = y_pred
         self.y_target = y_target
 
@@ -63,18 +64,17 @@ class BinaryCrossEntropy(Loss):
 
     def der(self, gradient):
         value = self.y_target.value/self.y_pred.value + (1 - self.y_target.value)/(1 - self.y_pred.value)
-        return autoTensor(value = value)
+        return autoTensor(value = -value)
 
     def __repr__(self):
-        value = torch.sum(self.value)
+        value = -torch.sum(self.value)/self.value.size()[0]
         return f"Cost : autoTensor({value})"
 
 class LogLikelihood(Loss):
-
     """Minus Log Likelihood Function is similar to multiclass cross entropy Loss"""
 
     def __init__(self, y_pred, y_target):
-        super(Loss, self).__init__(value = -(y_target.value*torch.log(y_pred.value)))
+        super(LogLikelihood, self).__init__(value = -(y_target.value*torch.log(y_pred.value)))
         self.y_pred = y_pred
         self.y_target = y_target
 
@@ -83,9 +83,9 @@ class LogLikelihood(Loss):
 
     def der(self, gradient):
         value = self.y_target.value/self.y_pred.value
-        return autoTensor(value = value)
+        return autoTensor(value = -value)
 
     def __repr__(self):
-        value = torch.sum(self.value)
+        value = -torch.sum(self.value)/self.value.size()[0]
         return f"Cost : autoTensor({value})"
 
