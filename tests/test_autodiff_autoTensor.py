@@ -8,25 +8,39 @@ sys.path.insert(0, myPath + '/../')
 from autodiff.autotensor import make_autoTensor,make_torchTensor,autoTensor,Node
 import torch
 
-class test_autoTensor(unittest.TestCase):
+class test_class_autoTensor(unittest.TestCase):
     pass
     #TODO
 
-class test_Node(unittest.TestCase):
+class test_class_Node(unittest.TestCase):
     pass
     #TODO
 
 class test_func_make_autoTensor(unittest.TestCase):
     def test_make_autoTensor(self):
         obj = make_autoTensor(0)
+        assert isinstance(obj,autoTensor)
+
         obj = make_autoTensor(True)
-        obj = make_autoTensor(9)
+        assert isinstance(obj,autoTensor)
+
+        obj = make_autoTensor(torch.rand(1))
+        assert isinstance(obj,autoTensor)
+
         obj = make_autoTensor(obj)
+        assert isinstance(obj,autoTensor)
 
 class test_func_make_torchTensor(unittest.TestCase):
 
     def test_make_torchTensor(self):
         obj = make_torchTensor(0)
+        assert isinstance(obj,torch.Tensor)
+
         obj = make_torchTensor(True)
-        obj = make_torchTensor(9)
-        obj = make_torchTensor(make_autoTensor(obj))
+        assert isinstance(obj,torch.Tensor)
+
+        obj = make_torchTensor(torch.rand(7,1))
+        assert isinstance(obj,torch.Tensor)
+
+        obj = make_torchTensor(torch.rand(7,1))
+        assert isinstance(obj,torch.Tensor)

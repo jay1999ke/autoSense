@@ -193,4 +193,4 @@ class Node(object):
 
 # Dealing with circular imports
 from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum
-from neural import Weight, Loss
+from neural import Weight
