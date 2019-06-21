@@ -31,6 +31,61 @@ class SquareError(Loss):
         return f"Cost : autoTensor({value})"
 
 
+class AbsoluteError(Loss):
+    """Produces Square error loss of Model"""
 
-# TODO: 
-# implemantation of all types of losess
+    def __init__(self,y_pred,y_target):
+        super(SquareError,self).__init__(value = torch.abs(y_pred.value-y_target.value))
+        self.y_pred = y_pred
+        self.y_target = y_target
+
+        back_channel = Node(autoVariable = y_pred,vjp = self.der)
+        self.channels.append(back_channel)
+
+    def der(self,gradient):
+        value = y_pred - y_target
+        value = value/torch.abs(value)  
+        return autoTensor(value=value)
+
+    def __repr__(self):
+        value = torch.sum(self.value)
+        return f"Cost : autoTensor({value})"
+
+
+class BinaryCrossEntropy(Loss):
+    def __init__(self, y_pred, y_target):
+        super(Loss, self).__init__(value = -(y_target.value*torch.log(y_pred.value)) + (1 - y_target.value)*torch.log(1 - y_pred.value))
+        self.y_pred = y_pred
+        self.y_target = y_target
+
+        back_channel = Node(autoVariable = y_pred, vjp = self.der)
+        self.channels.append(back_channel)
+
+    def der(self, gradient):
+        value = self.y_target.value/self.y_pred.value + (1 - self.y_target.value)/(1 - self.y_pred.value)
+        return autoTensor(value = value)
+
+    def __repr__(self):
+        value = torch.sum(self.value)
+        return f"Cost : autoTensor({value})"
+
+class LogLikelihood(Loss):
+
+    """Minus Log Likelihood Function is similar to multiclass cross entropy Loss"""
+
+    def __init__(self, y_pred, y_target):
+        super(Loss, self).__init__(value = -(y_target.value*torch.log(y_pred.value)))
+        self.y_pred = y_pred
+        self.y_target = y_target
+
+        back_channel = Node(autoVariable = y_pred, vjp = self.der)
+        self.channels.append(back_channel)
+
+    def der(self, gradient):
+        value = self.y_target.value/self.y_pred.value
+        return autoTensor(value = value)
+
+    def __repr__(self):
+        value = torch.sum(self.value)
+        return f"Cost : autoTensor({value})"
+
