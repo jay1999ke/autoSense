@@ -1,6 +1,6 @@
 import numpy as np
 from autodiff import autoTensor
-from neural import Loss
+from neural import Loss, Weight
 import matplotlib.pyplot as plt
 import torch
 
