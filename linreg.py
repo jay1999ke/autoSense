@@ -1,8 +1,9 @@
 import numpy as np
 from autodiff import autoTensor
-from neural import Loss, Weight, Initializer
+from neural import Loss, Weight, Initializer, Linear
 import matplotlib.pyplot as plt
 import torch
+import time
 
 if __name__ == "__main__":
 
@@ -23,31 +24,32 @@ if __name__ == "__main__":
     y = autoTensor(y)
 
     initer = Initializer("he")
-    w = Weight(shape=(1,1),initializer=initer)
-    w2 = Weight(shape=(1,1),initializer=initer)
-    b = Weight(shape=(1,1),initializer=initer)
+
+    l1 = Linear(1,1,initer)
+    l2 = Linear(1,1,initer,bias=False)   
 
     lr = 0.000001
-
+    s = time.time()
     for x in range(60000):
 
-        h = (X * w + X2*w2) + b
+        h = l1(X) + l2(X2)
         loss = Loss.SquareError(h,y)
         loss.backward()
 
-        w.value -= lr* w.grad.value
-        b.value -= lr* b.grad.value
-        w2.value -= lr*w2.grad.value
+        l1.weight.value -= lr* l1.weight.grad.value
+        l2.weight.value -= lr* l2.weight.grad.value
+        l1.bias.value -= lr* l1.bias.grad.value
 
         if x%3000 == 0:
-            print(x,"\t","loss: ",loss)
+            print(x,"\t","loss: ",loss,time.time()-s)
+            s = time.time()
         loss.grad_sweep()
 
     print(x,"loss: ",loss)
 
-    w = w.numpy()[0]
-    w2 = w2.numpy()[0]
-    b = b.numpy()[0]
+    w = l1.weight.numpy()[0]
+    w2 = l2.weight.numpy()[0]
+    b = l1.bias.numpy()[0]
     print(w,b)
 
     q = []

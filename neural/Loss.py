@@ -27,7 +27,7 @@ class SquareError(Loss):
         return autoTensor(value=value)
 
     def __repr__(self):
-        value = torch.sum(self.value)
+        value = torch.sum(self.value)/self.value.size()[0]
         return f"Cost : autoTensor({value})"
 
 
