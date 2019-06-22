@@ -15,6 +15,7 @@ if __name__ == "__main__":
     y_c = y
     m=y.size
     X2 = X**2
+    X2_c = X2
 
     #plt.scatter(X[:, 0], y)
     #plt.show()
@@ -52,18 +53,15 @@ if __name__ == "__main__":
     b = l1.bias.numpy()[0]
     print(w,b)
 
-    q = []
     e=[]
-    for x in range(4,25):
-        q.append(x)
-        e.append(b + w*x + w2*(x**2))
+    X__c = X_c*w
+    X2_c = X2_c*w2
+    X = X__c +X2_c + b
+    for x in range(m):
+        e.append(X[x])
     plt.scatter(X_c[:, 0], y_c)
-    plt.plot(e)
+    plt.scatter(X_c[:, 0], e)
     plt.show()
 
-    pred = h.numpy()
-    for x in range(m):
-        #print(pred[x],y_c[x],pred[x]-y_c[x])
-        pass
 
     

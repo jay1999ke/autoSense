@@ -8,5 +8,7 @@ sys.path.insert(0, myPath + '/../')
 
 
 class test_class_Linear(unittest.TestCase):
+    def setup_method(self, method):
+        print("\n%s:%s" % (type(self).__name__, method.__name__))
     pass
     #TODO
