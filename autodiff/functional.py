@@ -158,7 +158,7 @@ class Power(autoTensor):
     """Power "autoTensor" function"""
 
     def __init__(self, tensor1, pow_val):
-        super(Power,self).__init__(tensor1.value**pow_val.value)
+        super(Power,self).__init__(tensor1.value**pow_val)
 
         self.requires_grad = tensor1.requires_grad
 
@@ -172,13 +172,13 @@ class Power(autoTensor):
         tensor = self.tensor1
         pow_val = self.pow_val
         gradient = reverse_broadcast(gradient,tensor)
-        back_grad = pow_val.value * gradient.value * (tensor.value**(pow_val.value-1))
+        back_grad = pow_val * gradient.value * (tensor.value**(pow_val-1))
         return autoTensor(value=back_grad)
 
 class Sum(autoTensor):
     """Elements sum "autoTensor" function"""
 
-    def __init__(self, tensor1, axis):
+    def __init__(self, tensor1, axis=0):
         super(Sum,self).__init__(tensor1.value.sum(dim=axis,keepdim=True))
 
         self.requires_grad = tensor1.requires_grad
