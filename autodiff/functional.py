@@ -246,4 +246,18 @@ class relu(autoTensor):
         back_grad = gradient.value * sub_grad
         return autoTensor(value=back_grad)
 
+class Exp(autoTensor):
+    """exp "autoTensor" function"""
 
+    def __init__(self, tensor1):
+        super(Exp,self).__init__(torch.exp(tensor1.value))
+        self.requires_grad = tensor1.requires_grad
+
+        if tensor1.requires_grad:
+            back_channel = Node(tensor1, self.der_pos1)
+            self.tensor1 = tensor1
+            self.channels.append(back_channel)
+
+    def der_pos1(self, gradient):
+        back_grad = gradient.value * self.value
+        return autoTensor(value=back_grad)

@@ -161,6 +161,9 @@ class autoTensor(object):
     def sum(self,axis=0):
         return Sum(self,axis)
 
+    def exp(self):
+        return Exp(self)
+
 class Node(object):   
     """Node for a reverse computation graph"""
 
@@ -192,5 +195,5 @@ class Node(object):
                 back_channel.autoVariable.update_weights()
 
 # Dealing with circular imports
-from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum
+from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum, Exp
 from neural import Weight
