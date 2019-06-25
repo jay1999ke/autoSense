@@ -5,7 +5,7 @@ myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 
 #imports below
-from autodiff.functional import Conv2d, Add, Substract, MatMul, Multiply, Power, Sum, Divide, Negate, tanh, sigmoid, relu, Exp
+from autodiff.functional import Flatten2d, Conv2d, Add, Substract, MatMul, Multiply, Power, Sum, Divide, Negate, tanh, sigmoid, relu, Exp
 from autodiff.autotensor import autoTensor, make_autoTensor,Node
 import torch
 
@@ -382,3 +382,26 @@ class test_class_Conv2d(unittest.TestCase):
         obj.backprop(autoTensor(torch.rand(3,6,16,16)))
 
         assert bias.grad.size() == bias.size()
+
+class test_class_Flatten2d(unittest.TestCase):
+    def setup_method(self, method):
+        print("\n%s:%s" % (type(self).__name__, method.__name__))
+
+    def test_init(self):
+        image = autoTensor(torch.rand(3,3,20,20))
+        image.requires_grad = True
+
+        obj = Flatten2d(image)
+
+        assert obj.size() == torch.empty(3,1200).size()
+        assert obj.channels[0].autoVariable == image
+
+    def test_der(self):
+        image = autoTensor(torch.rand(3,3,20,20))
+        image.requires_grad = True
+
+        obj = Flatten2d(image)
+        obj.backprop(autoTensor(obj.value))
+
+        assert image.value.size() == image.grad.value.size()
+        assert torch.equal(image.value,image.grad.value)

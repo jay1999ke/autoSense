@@ -312,3 +312,20 @@ class Conv2d(autoTensor):
     def der_bias(self,gradient):
         back_grad = gradient.value.mean(0).mean(1).mean(1).view(self.filters.value.size()[0])
         return autoTensor(value=back_grad)
+
+class Flatten2d(autoTensor):
+    """Flatten imageblock to unrolled logits"""
+    def __init__(self,inputs):
+        super(Flatten2d,self).__init__(value=inputs.value.view(inputs.size()[0],-1))
+        self.requires_grad = inputs.requires_grad
+
+        if self.requires_grad:
+            self.inputs_size = inputs.size()
+            back_channel = Node(inputs, self.der)
+            self.channels.append(back_channel)
+    
+    def der(self,gradient):
+        back_grad = gradient.value
+        back_grad = back_grad.view(self.inputs_size)
+        return autoTensor(value=back_grad)
+        
