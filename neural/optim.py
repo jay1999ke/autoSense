@@ -1,6 +1,25 @@
 from autodiff.autotensor import autoTensor, Node
 from neural.param import Weight
+import neural
 
+class optimNode(Node):
+    
+    @staticmethod
+    def dfs_update_param(channels,learning_rate):
+        for back_channel in channels:
+            if isinstance(back_channel.autoVariable,neural.param.Weight):
+                back_channel.autoVariable.update_weights(learning_rate)
+            optimNode.dfs_update_param(back_channel.autoVariable.channels,learning_rate)
+
+    @staticmethod
+    def dfs_update_gdmomentum(channels,learning_rate,beta):
+        for back_channel in channels:
+            if isinstance(back_channel.autoVariable,neural.param.Weight):
+                if back_channel.autoVariable.grad_saved == None:
+                    back_channel.autoVariable.grad_saved = autoTensor(value = back_channel.autoVariable.grad.value)
+
+                back_channel.autoVariable.gdmomentum(learning_rate,beta)
+            optimNode.dfs_update_gdmomentum(back_channel.autoVariable.channels,learning_rate,beta)      
 
 class Optimizer(object):
     
@@ -13,12 +32,10 @@ class Optimizer(object):
 
     def step(self):
         if self.type == "sgd":
-            Node.dfs_update_param(self.loss.channels,self.learning_rate)
+            optimNode.dfs_update_param(self.loss.channels,self.learning_rate)
         elif self.type == "gdmomentum":
             #standard gd with momentum
-            Node.dfs_grad_copy(self.loss.channels)
-
-            #TODO: complete this
+            optimNode.dfs_update_gdmomentum(self.loss.channels,self.learning_rate,self.beta)
 
         #TODO : complete other optim methods
 

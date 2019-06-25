@@ -184,22 +184,10 @@ class Node(object):
                 back_channel.autoVariable.backprop(back_gradient)
 
     @staticmethod
-    def dfs_grad_copy(channels):
-        for back_channel in channels:
-            if back_channel.autoVariable.requires_grad and isinstance(back_channel.autoVariable,Weight):
-                back_channel.autoVariable.grad_saved = autoTensor(value=back_channel.autoVariable.grad.value)
-
-    @staticmethod
     def dfs_grad(channels):
         for back_channel in channels:
             if back_channel.autoVariable.requires_grad:
                 back_channel.autoVariable.grad_sweep()
-
-    @staticmethod
-    def dfs_update_param(channels,learning_rate):
-        for back_channel in channels:
-            if back_channel.autoVariable.requires_grad and isinstance(back_channel.autoVariable,Weight):
-                back_channel.autoVariable.update_weights()
 
 # Dealing with circular imports
 from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum, Exp

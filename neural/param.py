@@ -15,6 +15,11 @@ class Weight(autoTensor):
     def update_weights(self,learning_rate):
         self.value = self.value - learning_rate*self.grad.value
 
+    def gdmomentum(self,learning_rate,beta):
+        self.grad_saved.value = self.grad_saved.value * beta + (1-beta)*self.grad.value
+        self.value -= learning_rate*self.grad_saved.value
+
+
 # TODO:
 # Implementation of all kinds of initialization techniques
 

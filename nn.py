@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import scipy.io as mat
 from autodiff import autoTensor
-from neural import Loss, Weight, Initializer, Linear
+from neural import Loss, Weight, Initializer, Linear, Optimizer, optimNode
 import autodiff.functional as F
 
 def get_accuracy_value(pred, y):
@@ -36,15 +36,12 @@ if __name__ == "__main__":
         l3 = F.sigmoid(layer3(l2))
         loss = Loss.SquareError(l3,y)
         loss.backward()
+        SGD = Optimizer("gdmomentum",loss,lr,beta=0.2)
+        SGD.step()
 
-        layer1.weight.value -= lr* layer1.weight.grad.value
-        layer2.weight.value -= lr* layer2.weight.grad.value
-        layer3.weight.value -= lr* layer3.weight.grad.value
-        layer1.bias.value -= lr* layer1.bias.grad.value
-        layer2.bias.value -= lr* layer2.bias.grad.value
-        layer3.bias.value -= lr* layer3.bias.grad.value
-        if x%20 == 0:
-            print(x,"\t","loss: ",loss,get_accuracy_value(l3,y))
+
+        if x%50 == 0:
+            print(get_accuracy_value(l3,y))
         loss.grad_sweep()
 
 
