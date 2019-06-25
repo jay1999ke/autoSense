@@ -1,6 +1,7 @@
 import torch
 from autodiff.autotensor import autoTensor, Node
 from autodiff.utils import reverse_broadcast
+import torch.nn.functional as F
 
 class MatMul(autoTensor):
     """Matrix multiplication "autoTensor" function"""
@@ -260,4 +261,54 @@ class Exp(autoTensor):
 
     def der_pos1(self, gradient):
         back_grad = gradient.value * self.value
+        return autoTensor(value=back_grad)
+
+
+class Conv2d(autoTensor):
+    """Convolution operation"""
+    
+    def __init__(self,image_block,filters,bias,padding=0,stride=1):
+        conv = F.conv2d(input=image_block.value,
+            weight=filters.value,
+            bias=bias.value,
+            stride=(stride,stride),
+            padding = (padding,padding)
+        )
+        super(Conv2d,self).__init__(value=conv)
+
+        self.requires_grad = image_block.requires_grad or filters.requires_grad or bias.requires_grad
+        self.padding = padding
+        self.stride = stride
+        self.image_block = image_block
+        self.filters = filters
+        self.bias = bias
+
+        if image_block.requires_grad:
+            back_channel = Node(image_block,self.der_image)
+            self.channels.append(back_channel)
+        if filters.requires_grad:
+            back_channel = Node(filters,self.der_filters)
+            self.channels.append(back_channel)
+        if bias.requires_grad:
+            back_channel = Node(bias,self.der_bias)
+            self.channels.append(back_channel)
+
+    def der_image(self,gradient):
+        back_grad = F.conv_transpose2d(input = gradient.value,
+            weight = self.filters.value,
+            stride=(self.stride,self.stride),
+            padding = (self.padding,self.padding)
+            ) 
+        return autoTensor(value=back_grad)
+
+    def der_filters(self,gradient):
+        back_grad = F.conv2d(input = self.image_block.value.permute(1,0,2,3),
+                weight = gradient.value.permute(1,0,2,3),
+                stride = (self.stride,self.stride),
+                padding = (self.padding,self.padding)
+            ).permute(1,0,2,3)
+        return autoTensor(value=back_grad)
+
+    def der_bias(self,gradient):
+        back_grad = gradient.value.mean(0).mean(1).mean(1).view(self.filters.value.size()[0])
         return autoTensor(value=back_grad)
