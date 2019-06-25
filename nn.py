@@ -6,17 +6,17 @@ from neural import Loss, Weight, Initializer, Linear
 import autodiff.functional as F
 
 def get_accuracy_value(pred, y):
-    return 1-abs(torch.sum(y.value.max(dim=1)[1] - pred.value.max(dim=1)[1]).item()/y.size()[0])
+    return abs(torch.sum(y.value.max(dim=1)[1] == pred.value.max(dim=1)[1]).item()/y.size()[0])
 
 if __name__ == "__main__":
     raw_data = mat.loadmat("testdata/mnist_reduced.mat")
-    X = raw_data['X']
+    X = raw_data['X'].astype(np.float64)
     y = raw_data['y'].ravel()
     c_y=torch.Tensor(y).type(dtype=torch.FloatTensor)
     Y = np.zeros((5000, 10), dtype='uint8')
     for i, row in enumerate(Y):
         Y[i, y[i] - 1] = 1
-    y = Y.astype(np.float32)
+    y = Y.astype(np.float64)
 
     X = autoTensor(X)
     y = autoTensor(y)

@@ -41,6 +41,7 @@ class autoTensor(object):
         self.value = make_torchTensor(value).type(torch.FloatTensor)
         self.requires_grad = requires_grad
         self.grad = None
+        self.grad_saved = None
 
         if channels is None:
             self.channels = []
@@ -181,6 +182,12 @@ class Node(object):
             if back_channel.autoVariable.requires_grad:
                 back_gradient = back_channel.vjp(gradient)
                 back_channel.autoVariable.backprop(back_gradient)
+
+    @staticmethod
+    def dfs_grad_copy(channels):
+        for back_channel in channels:
+            if back_channel.autoVariable.requires_grad and isinstance(back_channel.autoVariable,Weight):
+                back_channel.autoVariable.grad_saved = autoTensor(value=back_channel.autoVariable.grad.value)
 
     @staticmethod
     def dfs_grad(channels):
