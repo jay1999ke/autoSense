@@ -22,3 +22,23 @@ class Linear(Layer):
             return F.MatMul(inputs,self.weight) + self.bias
         else:
             return F.MatMul(inputs,self.weight) 
+
+class Conv2D(Layer):
+
+    def __init__(self,filter_shape,padding=0,stride=1,initializer=None):
+        """
+        input – input tensor of shape (minibatch,in_channels,iH,iW) \n
+        weight – filters of shape (out_channels,in_channels,kH,kW) \n
+        bias – bias tensor of shape (out_channels). """
+        self.padding = padding
+        self.stride = stride
+        self.filter = Weight(filter_shape,initializer=initializer)
+        self.bias = Weight(shape = filter_shape[0])
+
+    def __call__(self,inputs):
+        return F.Conv2d(image_block=inputs,
+                        filters=self.filter,
+                        bias=self.bias,
+                        padding=self.padding,
+                        stride=self.stride
+                        )
