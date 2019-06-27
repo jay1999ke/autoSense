@@ -55,7 +55,7 @@ class MeanAbsoluteError(Loss):
 class BinaryCrossEntropy(Loss):
     """Produces BinaryCrossEntropy loss of a model"""
     def __init__(self, y_pred, y_target):
-        super(BinaryCrossEntropy, self).__init__(value = -(y_target.value*torch.log(y_pred.value)) + (1 - y_target.value)*torch.log(1 - y_pred.value))
+        super(BinaryCrossEntropy, self).__init__(value = -(y_target.value*torch.log(y_pred.value) + (1 - y_target.value)*torch.log(1 - y_pred.value)))
         self.y_pred = y_pred
         self.y_target = y_target
 
@@ -67,7 +67,7 @@ class BinaryCrossEntropy(Loss):
         return autoTensor(value = -value)
 
     def __repr__(self):
-        value = -torch.sum(self.value)/self.value.size()[0]
+        value = torch.sum(self.value)/self.value.size()[0]
         return f"Cost : autoTensor({value})"
 
 class LogLikelihood(Loss):

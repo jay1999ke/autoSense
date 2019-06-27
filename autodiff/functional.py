@@ -328,4 +328,19 @@ class Flatten2d(autoTensor):
         back_grad = gradient.value
         back_grad = back_grad.view(self.inputs_size)
         return autoTensor(value=back_grad)
+
+class Dpout(autoTensor):
+
+    def __init__(self,inputs,mask):
+        super(Dpout,self).__init__(value = inputs.value*mask)
+        self.requires_grad = inputs.requires_grad
+
+        if self.requires_grad:
+            self.mask = mask
+            back_channel = Node(inputs,self.der)
+            self.channels.append(back_channel)
+
+    def der(self,gradient):
+        back_grad = gradient.value*self.mask
+        return autoTensor(value=back_grad)
         

@@ -2,6 +2,7 @@ from autodiff.autotensor import autoTensor, Node
 import torch
 from neural import Weight, Initializer
 import autodiff.functional as F
+import torch.nn.init as torchInit
 
 class Layer(object):
     """Abstract class that is inherited by all types of layers""" 
@@ -42,3 +43,16 @@ class Conv2D(Layer):
                         padding=self.padding,
                         stride=self.stride
                         )
+
+class Dropout(Layer):
+
+    def __init__(self,input_shape,keep_prob=0.8):
+
+        self.input_shape = input_shape
+        self.keep_prob = keep_prob
+
+    def __call__(self,inputs):
+        mask = torchInit.uniform_(torch.rand(self.input_shape)).type(inputs.value.type())
+        mask[mask < self.keep_prob] = 1
+        mask[mask != 1 ] = 0
+        return F.Dpout(inputs,mask)

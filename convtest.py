@@ -2,10 +2,11 @@ import torch
 import numpy as np
 import scipy.io as mat
 from autodiff import autoTensor
-from neural import Loss, Weight, Initializer, Linear, Optimizer, optimNode, Conv2D
+from neural import Loss, Weight, Initializer, Linear, Optimizer, optimNode, Conv2D, Dropout
 import autodiff.functional as F
 import torch.nn.init as torchInit
 import matplotlib.pyplot as plt
+import gc
 
 def get_accuracy_value(pred, y):
     return abs(torch.sum(y.value.max(dim=1)[1] == pred.value.max(dim=1)[1]).item()/y.size()[0])
@@ -36,7 +37,8 @@ if __name__ == "__main__":
     
     
     initer = Initializer("xavier")
-    layer1 = Conv2D((3,1,7,7),initializer=initer)    
+    layer1 = Conv2D((3,1,7,7),initializer=initer)
+    d = Dropout((3,14,14))
     layer2 = Conv2D((6,3,7,7),initializer=initer)
     layer3 = Linear(384,10,initializer=initer)
 
@@ -44,8 +46,9 @@ if __name__ == "__main__":
 
     for x in range(500):
 
-        l1 = layer1(X)
-        l2 = F.Flatten2d(F.relu(layer2(l1)))
+        l1 = F.relu(layer1(X))
+        d1 = d(l1)
+        l2 = F.Flatten2d(F.relu(layer2(d1)))
         l3 = F.sigmoid(layer3(l2))
         loss = Loss.SquareError(l3,y)
         loss.backward()
@@ -53,6 +56,15 @@ if __name__ == "__main__":
         SGD = Optimizer("sgd",loss,lr)
         SGD.step()
 
-
         print(x,loss,get_accuracy_value(l3,y))
         loss.grad_sweep()
+
+        if x%50 == 0:
+            gc.collect()
+
+    l1 = F.relu(layer1(X))
+    l2 = F.Flatten2d(F.relu(layer2(l1)))
+    l3 = F.sigmoid(layer3(l2))
+    loss = Loss.SquareError(l3,y)
+    print(500,loss,get_accuracy_value(l3,y))
+
