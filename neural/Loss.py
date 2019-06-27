@@ -63,8 +63,8 @@ class BinaryCrossEntropy(Loss):
         self.channels.append(back_channel)
 
     def der(self, gradient):
-        value = self.y_target.value/self.y_pred.value + (1 - self.y_target.value)/(1 - self.y_pred.value)
-        return autoTensor(value = -value)
+        value = -self.y_target.value/self.y_pred.value + (1 - self.y_target.value)/(1 - self.y_pred.value)
+        return autoTensor(value = value)
 
     def __repr__(self):
         value = torch.sum(self.value)/self.value.size()[0]

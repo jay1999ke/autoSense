@@ -38,19 +38,17 @@ if __name__ == "__main__":
     
     initer = Initializer("xavier")
     layer1 = Conv2D((3,1,7,7),initializer=initer)
-    d = Dropout((3,14,14))
     layer2 = Conv2D((6,3,7,7),initializer=initer)
     layer3 = Linear(384,10,initializer=initer)
 
-    lr = 0.00005
+    lr = 0.000007
 
     for x in range(500):
 
         l1 = F.relu(layer1(X))
-        d1 = d(l1)
-        l2 = F.Flatten2d(F.relu(layer2(d1)))
+        l2 = F.Flatten2d(F.relu(layer2(l1)))
         l3 = F.sigmoid(layer3(l2))
-        loss = Loss.SquareError(l3,y)
+        loss = Loss.BinaryCrossEntropy(l3,y)
         loss.backward()
 
         SGD = Optimizer("sgd",loss,lr)
@@ -59,12 +57,5 @@ if __name__ == "__main__":
         print(x,loss,get_accuracy_value(l3,y))
         loss.grad_sweep()
 
-        if x%50 == 0:
+        if x%100 == 0:
             gc.collect()
-
-    l1 = F.relu(layer1(X))
-    l2 = F.Flatten2d(F.relu(layer2(l1)))
-    l3 = F.sigmoid(layer3(l2))
-    loss = Loss.SquareError(l3,y)
-    print(500,loss,get_accuracy_value(l3,y))
-
