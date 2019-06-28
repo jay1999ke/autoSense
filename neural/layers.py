@@ -24,6 +24,21 @@ class Linear(Layer):
         else:
             return F.MatMul(inputs,self.weight) 
 
+class Linear2(Layer):
+
+    def __init__(self, input1_dim,input2_dim, output_dim,initializer=None,bias=True):
+        self.weight = Weight(shape=(input1_dim,output_dim),initializer=initializer)
+        self.weight2 = Weight(shape=(input2_dim,output_dim),initializer=initializer)
+        if bias:
+            self.bias = Weight(shape=(1,output_dim),initializer=initializer)
+        self.bias_present = bias
+
+    def __call__(self,inputs1,inputs2):
+        if self.bias_present:
+            return F.MatMul(inputs1,self.weight) + self.bias + F.MatMul(inputs2,self.weight2)
+        else:
+            return F.MatMul(inputs1,self.weight) + F.MatMul(inputs2,self.weight2)
+
 class Conv2D(Layer):
 
     def __init__(self,filter_shape,padding=0,stride=1,initializer=None):
