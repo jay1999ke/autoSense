@@ -111,6 +111,42 @@ class lstm(object):
             gc.collect()
             print(time()-s,end=" ")
 
+    def run(self,X,y,glove_vocab,glove_embed):
+
+        for i,batch in enumerate(X):
+            self.c=autoTensor(torch.zeros(1,25))
+            y_t = autoTensor(y[i])
+            h = autoTensor(torch.zeros(1,25),requires_grad=True)
+            print(i,end=" ")
+            for j,word in enumerate(batch):
+                x = torch.ones(len(batch),25)
+                for k in range(len(batch)):
+                    try:
+                        index = glove_vocab.index(batch[j][k])
+                        sub_x = glove_embed[index].view(1,25)
+                    except :
+                        sub_x = glove_embed[0].view(1,25)*0
+                    x[k] = sub_x
+                x = autoTensor(x)
+                
+                f = F.sigmoid(self.f(h,x))
+                i = F.sigmoid(self.i(h,x))
+                c_ = F.tanh(self.c_(h,x))
+                self.c.requires_grad=False
+                o = F.sigmoid(self.o(h,x))
+                self.c = f*self.c + i*c_
+                h = o*F.tanh(self.c)
+            s=time()
+            z = F.sigmoid(self.out(h))
+            loss = Loss.BinaryCrossEntropy(z,y_t)
+            print(loss)
+            loss.backward()
+            op = Optimizer("sgd",loss,0.0001)
+            op.step()
+            gc.collect()
+            print(time()-s,end=" ")
+
+
 if __name__ == "__main__":
     
     file_name = "testdata/amzn.txt"
@@ -121,5 +157,31 @@ if __name__ == "__main__":
 
     print(torch.Tensor(glove_embed).size())
 
+    X_list = []
+    y_list = []
+    xlen = 0
+    subl=[]
+    subly=[]
+    for i,x in enumerate(X):
+        if len(x) == xlen:
+            subl.append(x)
+            subly.append(y[i])
+        else:
+            if len(subl) != 0:
+                X_list.append(subl)
+                y_list.append(subly)
+            subl = []
+            subl.append(x)
+            subly.append(y[i])
+            xlen = len(x)
+
+    suby=[]
+    for i,x in enumerate(X_list):
+        y_s = np.zeros((len(x),1))
+        for j,ins in enumerate(x):
+            y_s[j] = y_list[i][j]
+
+        suby.append(y_s)
+
     l = lstm()
-    l.forward(X,y,glove_vocab,torch.Tensor(glove_embed))
+    l.run(X_list,suby,glove_vocab,torch.Tensor(glove_embed))
