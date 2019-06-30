@@ -112,39 +112,63 @@ class lstm(object):
             print(time()-s,end=" ")
 
     def run(self,X,y,glove_vocab,glove_embed):
+        for epoch in range(500):
+            print("epoch: ",epoch)
+            epoch_loss = 0
+            acc = 0
+            for i in range(len(X)):
+                if i == 5:
+                    break
+                self.c=autoTensor(torch.zeros(1,25))
+                y_t = autoTensor(y[i])
+                h = autoTensor(torch.zeros(1,25),requires_grad=True)
 
-        for i,batch in enumerate(X):
-            self.c=autoTensor(torch.zeros(1,25))
-            y_t = autoTensor(y[i])
-            h = autoTensor(torch.zeros(1,25),requires_grad=True)
-            print(i,end=" ")
-            for j,word in enumerate(batch):
-                x = torch.ones(len(batch),25)
-                for k in range(len(batch)):
-                    try:
-                        index = glove_vocab.index(batch[j][k])
-                        sub_x = glove_embed[index].view(1,25)
-                    except :
-                        sub_x = glove_embed[0].view(1,25)*0
-                    x[k] = sub_x
-                x = autoTensor(x)
+                batch = X[i]
+                print("\t",i,len(batch[0]),end=" ")
+
+                t = time()
+                for j in range(len(batch[0])):
+                    for k in range(len(batch)):
+                        try:
+                            word = str(batch[k][j])
+                            index = glove_vocab.index(word)
+                            sub_x = glove_embed[index].view(1,25)
+                        except :
+                            sub_x = glove_embed[0].view(1,25)*0
+                        if k == 0:
+                            x = sub_x
+                        else:
+                            x = torch.cat((x,sub_x))
+
+                    x = autoTensor(x)
+                    
+                    f = F.sigmoid(self.f(h,x))
+                    i = F.sigmoid(self.i(h,x))
+                    c_ = F.tanh(self.c_(h,x))
+                    o = F.sigmoid(self.o(h,x))
+                    self.c = f*self.c + i*c_
+                    h = o*F.tanh(self.c)
+                print("t:",round(time()-t,4),end="\t")
+
+                s=time()
+                z = F.sigmoid(self.out(h))
+                loss = Loss.BinaryCrossEntropy(z,y_t)
+                print(loss,(get_accuracy_value(z,y_t),loss.value.size()[0]),end=" ")
+                loss.backward()
+                op = Optimizer("sgd",loss,0.00005)
+                op.step()
+                gc.collect()
+                print(round(time()-s,4))
+                epoch_loss+= loss.single()
+                acc += get_accuracy_value(z,y_t)
+            print("\nepoch summary: loss: ",epoch_loss/5," ACC: ",acc/316)
                 
-                f = F.sigmoid(self.f(h,x))
-                i = F.sigmoid(self.i(h,x))
-                c_ = F.tanh(self.c_(h,x))
-                self.c.requires_grad=False
-                o = F.sigmoid(self.o(h,x))
-                self.c = f*self.c + i*c_
-                h = o*F.tanh(self.c)
-            s=time()
-            z = F.sigmoid(self.out(h))
-            loss = Loss.BinaryCrossEntropy(z,y_t)
-            print(loss)
-            loss.backward()
-            op = Optimizer("sgd",loss,0.0001)
-            op.step()
-            gc.collect()
-            print(time()-s,end=" ")
+def get_accuracy_value(pred, y):
+    a = pred.value.clone()
+    a[a >= 0.5 ]=1
+    a[a!=1] = 0
+    return abs(torch.sum(y.value == a).item())
+
 
 
 if __name__ == "__main__":
@@ -154,8 +178,8 @@ if __name__ == "__main__":
 
     print(X[50],y[50],y.shape,len(X))
     glove_vocab,glove_embed = loadGloveModel("testdata/glove.twitter.27B.25d.txt")
-
-    print(torch.Tensor(glove_embed).size())
+    glove_embed = torch.Tensor(glove_embed)
+    print(glove_embed.size())
 
     X_list = []
     y_list = []
@@ -184,4 +208,4 @@ if __name__ == "__main__":
         suby.append(y_s)
 
     l = lstm()
-    l.run(X_list,suby,glove_vocab,torch.Tensor(glove_embed))
+    l.run(X_list,suby,glove_vocab,glove_embed)

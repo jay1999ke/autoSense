@@ -66,6 +66,10 @@ class BinaryCrossEntropy(Loss):
         value = -self.y_target.value/self.y_pred.value + (1 - self.y_target.value)/(1 - self.y_pred.value)
         return autoTensor(value = value)
 
+    def single(self):
+        value = torch.sum(self.value)/self.value.size()[0]
+        return value
+        
     def __repr__(self):
         value = torch.sum(self.value)/self.value.size()[0]
         return f"Cost : autoTensor({value})"

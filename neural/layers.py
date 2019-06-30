@@ -35,7 +35,7 @@ class Linear2(Layer):
 
     def __call__(self,inputs1,inputs2):
         if self.bias_present:
-            return F.MatMul(inputs1,self.weight) + self.bias + F.MatMul(inputs2,self.weight2)
+            return F.MatMul(inputs1,self.weight) + F.MatMul(inputs2,self.weight2) + self.bias 
         else:
             return F.MatMul(inputs1,self.weight) + F.MatMul(inputs2,self.weight2)
 
