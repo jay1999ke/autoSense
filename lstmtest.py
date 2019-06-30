@@ -111,8 +111,52 @@ class lstm(object):
             gc.collect()
             print(time()-s,end=" ")
 
+    def test(self,glove_vocab,glove_embed):
+        test1 = ["its","a","good","product"]
+        test2 = ["This","is","bad","indeed"]
+
+        print("\n\nTest 1: Its a good product",end=": ")
+        #test 1
+        self.c=autoTensor(torch.zeros(1,25))
+        h = autoTensor(torch.zeros(1,25))
+        for word in test1:
+            try:
+                index = glove_vocab.index(word)
+                sub_x = glove_embed[index].view(1,25)
+            except :
+                sub_x = glove_embed[0].view(1,25)*0
+            x = autoTensor(sub_x)
+            f = F.sigmoid(self.f(h,x))
+            i = F.sigmoid(self.i(h,x))
+            c_ = F.tanh(self.c_(h,x))
+            o = F.sigmoid(self.o(h,x))
+            self.c = f*self.c + i*c_
+            h = o*F.tanh(self.c)
+        z = F.sigmoid(self.out(h))
+        print(z)
+
+        print("\n\nTest 2: [This,is,bad,indeed] product",end=": ")
+        #test 1
+        self.c=autoTensor(torch.zeros(1,25))
+        h = autoTensor(torch.zeros(1,25))
+        for word in test2:
+            try:
+                index = glove_vocab.index(word)
+                sub_x = glove_embed[index].view(1,25)
+            except :
+                sub_x = glove_embed[0].view(1,25)*0
+            x = autoTensor(sub_x)
+            f = F.sigmoid(self.f(h,x))
+            i = F.sigmoid(self.i(h,x))
+            c_ = F.tanh(self.c_(h,x))
+            o = F.sigmoid(self.o(h,x))
+            self.c = f*self.c + i*c_
+            h = o*F.tanh(self.c)
+        z = F.sigmoid(self.out(h))
+        print(z)
+
     def run(self,X,y,glove_vocab,glove_embed):
-        for epoch in range(500):
+        for epoch in range(115):
             print("epoch: ",epoch)
             epoch_loss = 0
             acc = 0
@@ -177,7 +221,7 @@ if __name__ == "__main__":
     X,y = getXY(file_name)
 
     print(X[50],y[50],y.shape,len(X))
-    glove_vocab,glove_embed = loadGloveModel("testdata/glove.twitter.27B.25d.txt")
+    glove_vocab,glove_embed = loadGloveModel("testdata/ignore/glove.twitter.27B.25d.txt")
     glove_embed = torch.Tensor(glove_embed)
     print(glove_embed.size())
 
@@ -209,3 +253,4 @@ if __name__ == "__main__":
 
     l = lstm()
     l.run(X_list,suby,glove_vocab,glove_embed)
+    l.test(glove_vocab,glove_embed)
