@@ -1,15 +1,21 @@
 from autodiff.autotensor import autoTensor, Node
 import torch
+from models.rnn import LSTMnode
 
 #for implemantation of all types of losess
 
 class Loss(autoTensor):
-    def __init__(self,value, channels=None, requires_grad = True):
+    def __init__(self,value, channels=None, requires_grad = True,isLSTM = False):
         super(Loss,self).__init__(value=value, channels=None, requires_grad=requires_grad)
+        self.isLSTM = isLSTM
 
     def backward(self):
-        gradient = autoTensor(torch.ones(self.value.size()))
-        self.backprop(gradient)
+        if not self.isLSTM:
+            gradient = autoTensor(torch.ones(self.value.size()))
+            self.backprop(gradient)
+        else:
+            pass
+            #TODO
 
 class SquareError(Loss):
     """Produces Square error loss of Model"""

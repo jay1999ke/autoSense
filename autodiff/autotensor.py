@@ -37,11 +37,13 @@ def make_torchTensor(tensor):
 class autoTensor(object):
     """autoTensor is the basic building block for the automatic diffentiation system"""
     
-    def __init__(self, value, channels=None, requires_grad: bool = False):
-        self.value = make_torchTensor(value).type(torch.FloatTensor)
+    def __init__(self, value, channels=None, requires_grad: bool = False,name = None):
+        self.value = make_torchTensor(value).type(torch.cuda.FloatTensor)
         self.requires_grad = requires_grad
         self.grad = None
         self.grad_saved = None
+        self.name = name
+        self.trace_count = 0
 
         if channels is None:
             self.channels = []
@@ -76,6 +78,23 @@ class autoTensor(object):
         self.grad.value = self.grad.value + gradient.value 
 
         Node.dfs(channels = self.channels, gradient = gradient)
+
+    def trace_backprop(self):
+        self.trace_count +=1
+        if self.name is not None:
+            print(str(type(self)) + self.name, self.trace_count)
+        else:
+            noc = len(self.channels)
+            if noc == 1:
+                print("\t",type(self),"\t",type(self.channels[0].autoVariable))
+            elif noc == 2:
+                print("\t",type(self),"\t",type(self.channels[0].autoVariable),"\t",type(self.channels[1].autoVariable))
+
+        Node.trace(channels = self.channels)
+
+    def reset_count(self):
+        self.trace_count=0
+        Node.reset_count(channels = self.channels)
     
     def grad_sweep(self):
         """Clears gradient values to zero in the local reverse computational sub-graph"""
@@ -182,6 +201,18 @@ class Node(object):
             if back_channel.autoVariable.requires_grad:
                 back_gradient = back_channel.vjp(gradient)
                 back_channel.autoVariable.backprop(back_gradient)
+
+    @staticmethod
+    def trace(channels):
+        for back_channel in channels:
+            if back_channel.autoVariable.requires_grad:
+                back_channel.autoVariable.trace_backprop()
+
+    @staticmethod
+    def reset_count(channels):
+        for back_channel in channels:
+            if back_channel.autoVariable.requires_grad:
+                back_channel.autoVariable.reset_count()
 
     @staticmethod
     def dfs_grad(channels):

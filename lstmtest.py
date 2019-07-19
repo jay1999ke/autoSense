@@ -9,7 +9,7 @@ import torch.nn.init as torchInit
 import matplotlib.pyplot as plt
 import gc
 from time import time
-
+from models.rnn import LSTMnode
 
 def getXY(file_name):
 
@@ -72,20 +72,15 @@ class lstm(object):
 
     def __init__(self):
         init = Initializer("xavier")
-
-        self.f = Linear2(25,25,25,init)
-        self.i = Linear2(25,25,25,init)
-        self.c_ = Linear2(25,25,25,init)
-        self.o = Linear2(25,25,25,init)
+        self.node = LSTMnode(25,25,25,init)
 
         self.out = Linear(25,1,init)
 
-        self.c = autoTensor(torch.zeros(1,25))
 
     def forward(self,X,y,glove_vocab,glove_embed):
         
         for i,sentence in enumerate(X):
-            self.c=autoTensor(torch.zeros(1,25))
+            self.node.c=autoTensor(torch.zeros(1,25))
             y_t = autoTensor(y[i])
             h = autoTensor(torch.zeros(1,25),requires_grad=True)
             print(i,end=" ")
@@ -95,12 +90,7 @@ class lstm(object):
                     x = autoTensor(glove_embed[i].view(1,25))
                 except :
                     x = autoTensor(glove_embed[0].view(1,25)*0)
-                f = F.sigmoid(self.f(h,x))
-                i = F.sigmoid(self.i(h,x))
-                c_ = F.tanh(self.c_(h,x))
-                o = F.sigmoid(self.o(h,x))
-                self.c = f*self.c + i*c_
-                h = o*F.tanh(self.c)
+                h=self.node.forward(h,x)
             s=time()
             z = F.sigmoid(self.out(h))
             loss = Loss.BinaryCrossEntropy(z,y_t)
@@ -117,7 +107,7 @@ class lstm(object):
 
         print("\n\nTest 1: Its a good product",end=": ")
         #test 1
-        self.c=autoTensor(torch.zeros(1,25))
+        self.node.c=autoTensor(torch.zeros(1,25))
         h = autoTensor(torch.zeros(1,25))
         for word in test1:
             try:
@@ -126,18 +116,13 @@ class lstm(object):
             except :
                 sub_x = glove_embed[0].view(1,25)*0
             x = autoTensor(sub_x)
-            f = F.sigmoid(self.f(h,x))
-            i = F.sigmoid(self.i(h,x))
-            c_ = F.tanh(self.c_(h,x))
-            o = F.sigmoid(self.o(h,x))
-            self.c = f*self.c + i*c_
-            h = o*F.tanh(self.c)
+            h=self.node.forward(h,x,j)
         z = F.sigmoid(self.out(h))
         print(z)
 
-        print("\n\nTest 2: [This,is,bad,indeed] product",end=": ")
+        print("\n\nTest 2: [This,is,bad,indeed]",end=": ")
         #test 1
-        self.c=autoTensor(torch.zeros(1,25))
+        self.node.c=autoTensor(torch.zeros(1,25))
         h = autoTensor(torch.zeros(1,25))
         for word in test2:
             try:
@@ -146,12 +131,7 @@ class lstm(object):
             except :
                 sub_x = glove_embed[0].view(1,25)*0
             x = autoTensor(sub_x)
-            f = F.sigmoid(self.f(h,x))
-            i = F.sigmoid(self.i(h,x))
-            c_ = F.tanh(self.c_(h,x))
-            o = F.sigmoid(self.o(h,x))
-            self.c = f*self.c + i*c_
-            h = o*F.tanh(self.c)
+            h=self.node.forward(h,x,j)
         z = F.sigmoid(self.out(h))
         print(z)
 
@@ -163,7 +143,7 @@ class lstm(object):
             for i in range(len(X)):
                 if i == 5:
                     break
-                self.c=autoTensor(torch.zeros(1,25))
+                self.node.c=autoTensor(torch.zeros(1,25))
                 y_t = autoTensor(y[i])
                 h = autoTensor(torch.zeros(1,25),requires_grad=True)
 
@@ -186,18 +166,16 @@ class lstm(object):
 
                     x = autoTensor(x)
                     
-                    f = F.sigmoid(self.f(h,x))
-                    i = F.sigmoid(self.i(h,x))
-                    c_ = F.tanh(self.c_(h,x))
-                    o = F.sigmoid(self.o(h,x))
-                    self.c = f*self.c + i*c_
-                    h = o*F.tanh(self.c)
+                    h=self.node.forward(h,x,j)
                 print("t:",round(time()-t,4),end="\t")
 
                 s=time()
                 z = F.sigmoid(self.out(h))
                 loss = Loss.BinaryCrossEntropy(z,y_t)
                 print(loss,(get_accuracy_value(z,y_t),loss.value.size()[0]),end=" ")
+                
+                #loss.trace_backprop()
+                loss.reset_count()
                 loss.backward()
                 op = Optimizer("sgd",loss,0.00005)
                 op.step()
@@ -222,7 +200,7 @@ if __name__ == "__main__":
 
     print(X[50],y[50],y.shape,len(X))
     glove_vocab,glove_embed = loadGloveModel("testdata/ignore/glove.twitter.27B.25d.txt")
-    glove_embed = torch.Tensor(glove_embed)
+    glove_embed = torch.Tensor(glove_embed).cuda()
     print(glove_embed.size())
 
     X_list = []

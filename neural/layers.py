@@ -1,6 +1,6 @@
 from autodiff.autotensor import autoTensor, Node
 import torch
-from neural import Weight, Initializer
+from neural.param import Weight, Initializer
 import autodiff.functional as F
 import torch.nn.init as torchInit
 
