@@ -105,6 +105,9 @@ class autoTensor(object):
         self.grad_zeros()
         Node.dfs_grad(self.channels)
 
+    def transpose(self,*idx):
+        return Transpose(self,*idx)
+
     def numpy(self):
         return self.value.cpu().detach().numpy()
 
@@ -224,5 +227,5 @@ class Node(object):
                 back_channel.autoVariable.grad_sweep()
 
 # Dealing with circular imports
-from autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum, Exp
-from neural import Weight
+from autosense.autodiff.functional import Add, MatMul, Multiply, Negate, Substract, Power, Divide, Sum, Exp
+from autosense.neural import Weight

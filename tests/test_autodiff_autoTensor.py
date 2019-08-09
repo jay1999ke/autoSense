@@ -1,11 +1,8 @@
 import unittest
 import pytest
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../')
 
 #imports below
-from autodiff.autotensor import make_autoTensor,make_torchTensor,autoTensor,Node
+from autosense.autodiff.autotensor import make_autoTensor,make_torchTensor,autoTensor,Node
 import torch
 
 class test_class_Node(unittest.TestCase):

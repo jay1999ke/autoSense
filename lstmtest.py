@@ -2,14 +2,14 @@ import torch
 import string
 import numpy as np
 import scipy.io as mat
-from autodiff import autoTensor
-from neural import Loss, Weight, Initializer, Linear, Optimizer, Linear2
-import autodiff.functional as F
+from autosense.autodiff import autoTensor
+from autosense.neural import Loss, Weight, Initializer, Linear, Optimizer, Linear2
+import autosense.autodiff.functional as F
 import torch.nn.init as torchInit
 import matplotlib.pyplot as plt
 import gc
 from time import time
-from models.rnn import LSTMnode
+from autosense.models.rnn import LSTMnode
 
 def getXY(file_name):
 
@@ -141,7 +141,7 @@ class lstm(object):
             epoch_loss = 0
             acc = 0
             for i in range(len(X)):
-                if i == 5:
+                if i == 6:
                     break
                 self.node.c=autoTensor(torch.zeros(1,25))
                 y_t = autoTensor(y[i])

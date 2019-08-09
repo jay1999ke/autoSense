@@ -1,7 +1,7 @@
 import torch
 import numpy as np
-from autodiff import autoTensor as tensor
-import autodiff.functional as F
+from autosense.autodiff import autoTensor as tensor
+import autosense.autodiff.functional as F
 
 a = tensor(torch.ones(3,3))
 a.requires_grad=True

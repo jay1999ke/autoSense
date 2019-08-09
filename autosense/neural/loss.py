@@ -1,6 +1,6 @@
-from autodiff.autotensor import autoTensor, Node
+from autosense.autodiff.autotensor import autoTensor, Node
 import torch
-from models.rnn import LSTMnode
+from autosense.models.rnn import LSTMnode
 
 #for implemantation of all types of losess
 

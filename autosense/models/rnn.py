@@ -1,11 +1,11 @@
 # analysis file
 # TODO:approriate changes required post-analysis
 
-from autodiff.autotensor import autoTensor, Node
+from autosense.autodiff.autotensor import autoTensor, Node
 import torch
-from neural.param import Weight, Initializer
-from neural.layers import Linear2
-import autodiff.functional as F
+from autosense.neural.param import Weight, Initializer
+from autosense.neural.layers import Linear2
+import autosense.autodiff.functional as F
 import torch.nn.init as torchInit
 
 class LSTMnode(object):

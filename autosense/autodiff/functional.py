@@ -1,6 +1,6 @@
 import torch
-from autodiff.autotensor import autoTensor, Node
-from autodiff.utils import reverse_broadcast
+from autosense.autodiff.autotensor import autoTensor, Node
+from autosense.autodiff.utils import reverse_broadcast
 import torch.nn.functional as F
 
 class Transpose(autoTensor):

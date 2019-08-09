@@ -1,12 +1,9 @@
 import unittest
 import pytest
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../')
 
 #imports below
-from autodiff.functional import Add, Substract, MatMul, Multiply, Power, Sum, Divide, Negate, tanh, sigmoid, relu
-from autodiff.autotensor import autoTensor, make_autoTensor,Node
+from autosense.autodiff.functional import Add, Substract, MatMul, Multiply, Power, Sum, Divide, Negate, tanh, sigmoid, relu
+from autosense.autodiff.autotensor import autoTensor, make_autoTensor,Node
 import torch
 
 class test_func_reverse_broadcast(unittest.TestCase):

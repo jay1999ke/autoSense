@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 import scipy.io as mat
-from autodiff import autoTensor
-from neural import Loss, Weight, Initializer, Linear, Optimizer, optimNode, Conv2D, Dropout
-import autodiff.functional as F
+from autosense.autodiff import autoTensor
+from autosense.neural import Loss, Weight, Initializer, Linear, Optimizer, optimNode, Conv2D, Dropout
+import autosense.autodiff.functional as F
 import torch.nn.init as torchInit
 import matplotlib.pyplot as plt
 import gc

@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 import scipy.io as mat
-from autodiff import autoTensor
-from neural import Loss, Weight, Initializer, Linear, Optimizer, optimNode
-import autodiff.functional as F
+from autosense.autodiff import autoTensor
+from autosense.neural import Loss, Weight, Initializer, Linear, Optimizer, optimNode
+import autosense.autodiff.functional as F
 
 def get_accuracy_value(pred, y):
     return abs(torch.sum(y.value.max(dim=1)[1] == pred.value.max(dim=1)[1]).item()/y.size()[0])

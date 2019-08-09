@@ -1,5 +1,5 @@
 import torch
-from autodiff.autotensor import autoTensor
+from autosense.autodiff.autotensor import autoTensor
 from copy import deepcopy
 
 def reverse_broadcast(gradient,tensor):

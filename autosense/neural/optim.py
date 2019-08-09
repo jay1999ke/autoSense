@@ -1,6 +1,6 @@
-from autodiff.autotensor import autoTensor, Node
-from neural.param import Weight
-import neural
+from autosense.autodiff.autotensor import autoTensor, Node
+from autosense.neural.param import Weight
+import autosense.neural as neural
 
 class optimNode(Node):
     

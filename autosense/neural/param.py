@@ -1,4 +1,4 @@
-from autodiff.autotensor import autoTensor
+from autosense.autodiff.autotensor import autoTensor
 import torch
 import torch.nn.init as torchInit
 

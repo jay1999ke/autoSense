@@ -1,6 +1,9 @@
-autodiff/__pycache__
-neural/__pycache__
+autosense/autodiff/__pycache__
+autosense/neural/__pycache__
+autosense/models/__pycache__
 tests/__pycache__
-__pycache__
+autosense/__pycache__
 .__pycache__
 testdata/ignore
+.pytest_cache
+__pycache__

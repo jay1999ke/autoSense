@@ -1,12 +1,9 @@
 import unittest
 import pytest
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../')
 
 #imports below
-from autodiff.autotensor import autoTensor, make_autoTensor
-from neural.loss import SquareError, MeanAbsoluteError, BinaryCrossEntropy, LogLikelihood
+from autosense.autodiff.autotensor import autoTensor, make_autoTensor
+from autosense.neural.loss import SquareError, MeanAbsoluteError, BinaryCrossEntropy, LogLikelihood
 import torch
 
 class test_class_SquareError(unittest.TestCase):

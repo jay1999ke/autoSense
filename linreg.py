@@ -1,6 +1,6 @@
 import numpy as np
-from autodiff import autoTensor
-from neural import Loss, Weight, Initializer, Linear
+from autosense.autodiff import autoTensor
+from autosense.neural import Loss, Weight, Initializer, Linear
 import matplotlib.pyplot as plt
 import torch
 import time
