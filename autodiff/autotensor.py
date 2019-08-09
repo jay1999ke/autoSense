@@ -38,7 +38,7 @@ class autoTensor(object):
     """autoTensor is the basic building block for the automatic diffentiation system"""
     
     def __init__(self, value, channels=None, requires_grad: bool = False,name = None):
-        self.value = make_torchTensor(value).type(torch.cuda.FloatTensor)
+        self.value = make_torchTensor(value).type(torch.FloatTensor)
         self.requires_grad = requires_grad
         self.grad = None
         self.grad_saved = None
@@ -54,7 +54,10 @@ class autoTensor(object):
         return self.value.size()
 
     def __repr__(self):
-        return f"autoTensor(\n{self.value})\n"
+        if self.requires_grad:
+            return f"autoTensor(\n{self.value},requires_grad)\n"
+        else:
+            return f"autoTensor(\n{self.value})\n"
 
     def grad_zeros(self):
         if self.grad != None:

@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
 
         if x%50 == 0:
-            print(get_accuracy_value(l3,y))
+            print(x,loss,get_accuracy_value(l3,y))
         loss.grad_sweep()
 
 

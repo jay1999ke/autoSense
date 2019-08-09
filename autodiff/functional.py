@@ -3,6 +3,23 @@ from autodiff.autotensor import autoTensor, Node
 from autodiff.utils import reverse_broadcast
 import torch.nn.functional as F
 
+class Transpose(autoTensor):
+    def __init__(self, tensor: autoTensor ,*idx):
+        super(Transpose,self).__init__(self._transpose(tensor,*idx))
+        self.requires_grad = tensor.requires_grad
+        self.idx = list(idx)
+
+        if tensor.requires_grad:
+            back_channel = Node(tensor, self.der)
+            self.channels.append(back_channel)
+
+    def der(self,gradient):
+        return autoTensor(self._transpose(gradient,*self.idx))
+
+    @staticmethod
+    def _transpose(tensor,*idx):
+        return tensor.value.transpose(*idx)
+        
 class MatMul(autoTensor):
     """Matrix multiplication "autoTensor" function"""
 

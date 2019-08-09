@@ -175,7 +175,7 @@ class lstm(object):
                 print(loss,(get_accuracy_value(z,y_t),loss.value.size()[0]),end=" ")
                 
                 #loss.trace_backprop()
-                loss.reset_count()
+                #loss.reset_count()
                 loss.backward()
                 op = Optimizer("sgd",loss,0.00005)
                 op.step()
