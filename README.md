@@ -2,7 +2,7 @@
 
 A Minimalist Deep learning library
 
-We introduce autoTensor, a boxed pytorch tensor capable of backpropagation using automatic differntiation.
+We introduce autoTensor, a wrapped pytorch tensor capable of backpropagation using automatic differntiation. (Even though, pytorch's tensor itself is made for AD :P )
 
 ## autoDiff: Reverse Accumulation Mode Automatic Differntiation
 
