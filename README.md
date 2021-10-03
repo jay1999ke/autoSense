@@ -11,7 +11,7 @@ We introduce autoTensor, a wrapped pytorch tensor capable of backpropagation usi
 
 Every function is an autoTensor that has a backpropagation channel to compute the gradients with respect to dependent autoTensor.
 
-![Example](https://github.com/jay1999ke/autodiff/raw/master/autodiff.jpeg)
+![Example](https://github.com/jay1999ke/autosense/raw/master/autodiff.jpeg)
 
 
 #### TODO : Add documentation
